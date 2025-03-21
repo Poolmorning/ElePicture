@@ -183,7 +183,6 @@ public class ImageManager extends Application {
             copiedImage = file;//将选中的图片赋值给copiedImage
         }
     }
-
     //粘贴图片到当前选中的目录
     private void pasteImage() {
         if (copiedImage != null){
