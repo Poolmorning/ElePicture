@@ -11,9 +11,9 @@ import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.io.File;
 import java.util.ArrayList;
+import java.io.File;
+
 import java.util.List;
 
 public class ImageManager extends Application {
