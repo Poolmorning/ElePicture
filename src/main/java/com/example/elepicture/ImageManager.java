@@ -39,7 +39,6 @@ public class ImageManager extends Application {
     public Stage UI(){
         Stage primaryStage = new Stage();
         primaryStage.setTitle("电子图片管理程序");
-
         // 选择目录按钮
         Button selectDirButton = new Button("选择目录");
         selectDirButton.setOnAction(e -> openDirectoryChooser(primaryStage));
