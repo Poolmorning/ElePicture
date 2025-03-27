@@ -13,7 +13,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.*;
 import java.util.List;
-//
+///
 
  //电子图片管理程序的主类
 public class ImageManager extends Application {
