@@ -3,6 +3,7 @@ module com.example.elepicture {
     requires javafx.fxml;
 
 
+
     opens com.example.elepicture to javafx.fxml;
     exports com.example.elepicture;
 }
