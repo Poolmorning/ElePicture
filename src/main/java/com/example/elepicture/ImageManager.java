@@ -18,6 +18,7 @@ import java.util.*;
 
 public class ImageManager extends Application {
 
+    // imageExtensions：图片格式
     private final String[] imageExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp"};
     private final Set<VBox> selectedBoxes = new HashSet<>();
     private final Map<VBox, File> boxFileMap = new HashMap<>();
@@ -84,7 +85,7 @@ public class ImageManager extends Application {
                                             clearSelection();
                                             selectBox(box);
                                         }
-                                        showContextMenu(box, event.getScreenX(), event.getScreenY(), imagePreviewPane, statusLabel);
+
                                     }
                                 });
 
@@ -115,77 +116,7 @@ public class ImageManager extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    // 右键菜单
-    private void showContextMenu(VBox box, double x, double y, Pane parent, Label statusLabel) {
-        ContextMenu contextMenu = new ContextMenu();
 
-        MenuItem deleteItem = new MenuItem("删除");
-        MenuItem copyItem = new MenuItem("复制");
-        MenuItem pasteItem = new MenuItem("粘贴");
-        MenuItem renameItem = new MenuItem("重命名");
-
-        copyItem.setOnAction(e -> {
-            clipboard.clear();
-            for (VBox b : selectedBoxes) {
-                File file = boxFileMap.get(b);
-                if (file != null && file.exists()) {
-                    clipboard.add(file);
-                }
-            }
-            statusLabel.setText("已复制 " + clipboard.size() + " 张图片");
-        });
-
-        pasteItem.setOnAction(e -> {
-            int pastedCount = 0;
-            if (currentDirectory != null && clipboard.size() > 0) {
-                for (File source : clipboard) {
-                    String newName = getUniqueName(currentDirectory, source.getName());
-                    File dest = new File(currentDirectory, newName);
-                    try {
-                        copyFile(source, dest);
-                        pastedCount++;
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                // 刷新当前目录
-                TreeItem<File> currentItem = new TreeItem<>(currentDirectory);
-                currentItem.setExpanded(true);
-                currentItem.getParent().setExpanded(false); // 强制刷新
-                currentItem.getParent().setExpanded(true);
-                statusLabel.setText("粘贴完成，共粘贴 " + pastedCount + " 张图片");
-            }
-        });
-
-        renameItem.setOnAction(e -> statusLabel.setText("[待实现] 重命名 " + selectedBoxes.size() + " 张图片"));
-        deleteItem.setOnAction(e ->
-        {
-            if (selectedBoxes.isEmpty()) {
-                statusLabel.setText("请先选择要删除的图片");
-                return;
-            }
-
-            new Alert(Alert.AlertType.CONFIRMATION,
-                    "确定要删除选中的 " + selectedBoxes.size() + " 张图片吗？\n此操作不可撤销！",
-                    ButtonType.OK, ButtonType.CANCEL)
-                    .showAndWait()
-                    .filter(response -> response == ButtonType.OK)
-                    .ifPresent(response -> {
-                        int deletedCount = (int) selectedBoxes.stream()
-                                .map(boxFileMap::get)
-                                .filter(Objects::nonNull)
-                                .filter(File::exists)
-                                .filter(File::delete)
-                                .count();
-
-                        //refreshImagePreview(currentDirectory, statusLabel);
-                        statusLabel.setText("已删除 " + deletedCount + " 张图片");
-                    });
-        });
-
-        contextMenu.getItems().addAll(copyItem, pasteItem, deleteItem, renameItem);
-        contextMenu.show(box, x, y);
-    }
     // 复制文件
     private void copyFile(File source, File dest) throws IOException {
         try (InputStream in = new FileInputStream(source); OutputStream out = new FileOutputStream(dest)) {
@@ -260,8 +191,3 @@ public class ImageManager extends Application {
         launch(args);
     }
 }
-
-
-
-
-

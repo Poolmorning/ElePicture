@@ -17,7 +17,7 @@ public class DirectoryTreeView extends TreeView<File> {
 
     private void initTree() {
         // 创建根节点"计算机"
-        TreeItem<File> rootItem = new TreeItem<>(new File("计算机"));
+        TreeItem<File> rootItem = new TreeItem<>(new File("此电脑"));
         rootItem.setExpanded(true);
 
         // 获取所有磁盘根目录
