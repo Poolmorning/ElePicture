@@ -1,30 +1,15 @@
 package com.example.elepicture;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
 import java.io.*;
-import java.text.DecimalFormat;
-import java.util.*;
 
 public class ImageManager extends Application {
-
-    // imageExtensions：图片格式
-    private final String[] imageExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp"};
-    private final Set<VBox> selectedBoxes = new HashSet<>();
-    private final Map<VBox, File> boxFileMap = new HashMap<>();
-    private final List<File> clipboard = new ArrayList<>();
-    private File currentDirectory = null;
+    //private File currentDirectory = null;
     private ThumbnailManager thumbnailManager;
     private Label statusLabel;
 
@@ -39,6 +24,7 @@ public class ImageManager extends Application {
         imagePreviewPane.setPadding(new Insets(10));
         imagePreviewPane.setHgap(10);
         imagePreviewPane.setVgap(10);
+        imagePreviewPane.setPrefWrapLength(750); // 设置每行的宽度
         thumbnailManager = new ThumbnailManager();
         // 状态标签
         statusLabel = new Label("请选择一个目录查看图片。");
@@ -49,9 +35,9 @@ public class ImageManager extends Application {
         imageScrollPane.setFitToWidth(true);
 
         directoryTree.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                File dir = newVal.getValue();
-                currentDirectory = dir;
+            if (newVal != null) {//当用户选择新节点时触发
+                File dir = newVal.getValue();//获取选中节点对应的目录文件对象
+                //currentDirectory = dir;
                 thumbnailManager.generateThumbnails(dir, imagePreviewPane, statusLabel);
             }
         });
