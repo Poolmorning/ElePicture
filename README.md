@@ -21,6 +21,7 @@
 - 添加了ClipboardManager和FileOperator类，没人工注释
 - DirectoryTreeView，ThumbnailManager（除了showMenu）都已经人工检查写过注释
 - 调整图片框显得更整齐
+- 已完成基本的操作复制，粘贴，重命名，删除功能（但是还没完全按照要求完成，如多选图片进行操作）
 ## 课设题目
 ### 电子图片管理程序
 #### 1. 基本要求

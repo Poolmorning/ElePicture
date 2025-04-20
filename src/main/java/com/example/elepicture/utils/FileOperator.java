@@ -3,13 +3,16 @@ package com.example.elepicture.utils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.VBox;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 //文件操作工具类，提供文件的增删改查功能
@@ -21,68 +24,37 @@ public class FileOperator {
         this.clipboardManager = clipboardManager;
     }
 
-    /**
-     * 删除文件或目录（支持批量删除）
-     * @param targets 要删除的文件列表
-     * @return 是否成功删除
-     */
-    public boolean delete(List<File> targets) {
-        if (targets == null || targets.isEmpty()) {
-            return false;
-        }
+    //删除文件
+    public boolean delete(Set<VBox> selectedBoxes, HashMap<VBox, File> boxFileMap) throws IOException {
+        //获取其中的文件
+        List<File> targets = selectedBoxes.stream()
+                .map(boxFileMap::get)
+                .filter(Objects::nonNull)
+                .toList();
 
         // 确认对话框
-        if (!showConfirmationDialog("确认删除",
-                "确定要删除选中的 " + targets.size() + " 个文件/目录吗？")) {
-            return false;
+        Alert confirmAlert = new Alert(AlertType.CONFIRMATION,
+                "确定要删除选中的 " + targets.size() + " 个文件吗？");
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return false; // 用户取消删除
         }
 
-        boolean allSuccess = true;
-        for (File target : targets) {
-            if (!deleteSingleFile(target)) {
-                allSuccess = false;
-            }
+        for (File file : targets) {
+            Files.delete(file.toPath());
         }
+        return true;
 
-        if (!allSuccess) {
-            showErrorDialog("部分文件删除失败", "某些文件可能被占用或没有权限删除");
-        }
-
-        return allSuccess;
     }
 
-    private boolean deleteSingleFile(File file) {
-        try {
-            if (file.isDirectory()) {
-                // 递归删除目录
-                deleteDirectory(file);
-            } else {
-                Files.delete(file.toPath());
-            }
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private void deleteDirectory(File directory) throws IOException {
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                deleteSingleFile(file);
-            }
-        }
-        Files.delete(directory.toPath());
-    }
-
-    /**
-     * 复制文件到剪贴板
-     * @param sources 要复制的文件列表
-     * @return 是否成功复制
-     */
-    public boolean copy(List<File> sources) {
-        if (sources == null || sources.isEmpty()) {
+    //复制文件到剪贴板
+    public boolean copy(Set<VBox> selectedBoxes, HashMap<VBox, File> boxFileMap) {
+        //获取其中的文件
+        List<File> sources = selectedBoxes.stream()
+                .map(boxFileMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (sources.isEmpty()) {
             return false;
         }
 
@@ -106,99 +78,89 @@ public class FileOperator {
         return true;
     }
 
-    /**
-     * 粘贴文件到目标目录
-     * @param destination 目标目录
-     * @return 是否成功粘贴
-     */
+    //粘贴
     public boolean paste(File destination) {
         if (!destination.isDirectory()) {
             showErrorDialog("粘贴失败", "目标位置不是一个有效的目录");
             return false;
         }
-
+        //从剪贴板管理器获取待粘贴的文件列表
         List<File> filesToPaste = clipboardManager.getClipboardFiles();
+        // 检查剪贴板是否有文件
         if (filesToPaste == null || filesToPaste.isEmpty()) {
             return false;
         }
-
-        boolean allSuccess = true;
-
+        boolean allSuccess = true; // 标记是否所有文件都处理成功
+        //遍历所有待粘贴文件
         for (File source : filesToPaste) {
             try {
-                Path destPath = destination.toPath().resolve(source.getName());
-
-                // 处理文件名冲突
-                File destFile = handleNameConflict(destPath.toFile());
-
+                Path destPath = destination.toPath().resolve(source.getName());//目标路径
+                File destFile = handleNameConflict(destPath.toFile());// 处理文件名冲突
+                // 根据操作类型执行复制或剪切
                 if (clipboardManager.getOperationType() == ClipboardManager.OperationType.COPY) {
                     // 复制操作
-                    if (source.isDirectory()) {
-                        copyDirectory(source, destFile);
-                    } else {
-                        Files.copy(source.toPath(), destFile.toPath(),
-                                StandardCopyOption.REPLACE_EXISTING);
-                    }
-                } else {
+                    Files.copy(source.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);//直接复制并覆盖已存在的文件
+                }/* else {
                     // 剪切操作
                     if (source.isDirectory()) {
                         copyDirectory(source, destFile);
-                        deleteDirectory(source); // 剪切=复制+删除
+                        //deleteDirectory(source); // 剪切=复制+删除
                     } else {
                         Files.move(source.toPath(), destFile.toPath(),
                                 StandardCopyOption.REPLACE_EXISTING);
                     }
-                }
+                }*/
             } catch (IOException e) {
                 e.printStackTrace();
                 allSuccess = false;
             }
         }
 
-        if (!allSuccess) {
-            showErrorDialog("粘贴失败", "某些文件可能没有权限或已存在");
-        }
+
 
         return allSuccess;
     }
 
-    /**
-     * 重命名文件
-     * @param oldFile 原文件
-     * @param newName 新名称
-     * @return 是否成功重命名
-     */
-    public boolean rename(File oldFile, String newName) {
-        if (oldFile == null || newName == null || newName.trim().isEmpty()) {
-            return false;
-        }
+    //重命名
+    public boolean rename(Set<VBox> selectedBoxes, HashMap<VBox, File> boxFileMap) {
+        File oldFile = boxFileMap.get(selectedBoxes.iterator().next());
+        boolean success = false;
+        if (oldFile == null) return success;
+        //如果只选中了一个文件
+        if (selectedBoxes.size() == 1){
+            // 获取不带后缀的文件名
+            String oldName = oldFile.getName();
+            int dotIndex = oldName.lastIndexOf('.');
+            String baseName = (dotIndex > 0) ? oldName.substring(0, dotIndex) : oldName;
+            String extension = (dotIndex > 0) ? oldName.substring(dotIndex) : "";
 
-        if (oldFile.getName().equals(newName)) {
-            return true; // 名称相同，无需重命名
-        }
+            //弹出⼀个对话框，让⽤户输⼊新的⽂件名，不要改变⽂件的后缀名
+            TextInputDialog dialog = new TextInputDialog(baseName);
+            dialog.setTitle("重命名");
+            dialog.setHeaderText("请输入新的文件名");
+            dialog.setContentText("新的文件名：");
 
-        File newFile = new File(oldFile.getParent(), newName);
+            Optional<String> result = dialog.showAndWait();
+            if (result.isEmpty()) return success; // 用户取消
 
-        // 检查新文件名是否合法
-        if (!isValidFilename(newName)) {
-            showErrorDialog("重命名失败", "文件名包含非法字符");
-            return false;
-        }
+            String newName = result.get().trim();
+            if (newName.isEmpty()) return success; // 空名称
 
-        // 检查是否已存在同名文件
-        if (newFile.exists()) {
-            showErrorDialog("重命名失败", "已存在同名文件");
-            return false;
-        }
+            // 如果用户输入了后缀，使用用户输入的后缀
+            if (newName.contains(".")) {
+                extension = "";
+            }
+            File newFile = new File(oldFile.getParentFile(), newName + extension);
+            // 检查是否重命名到自己
+            if (oldFile.equals(newFile)) return true;
+            // 执行重命名
+            success = oldFile.renameTo(newFile);
+            return success;
 
-        try {
-            Files.move(oldFile.toPath(), newFile.toPath());
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            showErrorDialog("重命名失败", "文件可能被占用或没有权限");
-            return false;
         }
+        //如果选中了多个文件
+        return true;
+
     }
 
     /**
@@ -256,34 +218,6 @@ public class FileOperator {
         }
     }
 
-    /**
-     * 检查文件名是否合法
-     * @param name 文件名
-     * @return 是否合法
-     */
-    private boolean isValidFilename(String name) {
-        return !name.contains("\\") && !name.contains("/")
-                && !name.contains(":") && !name.contains("*")
-                && !name.contains("?") && !name.contains("\"")
-                && !name.contains("<") && !name.contains(">")
-                && !name.contains("|");
-    }
-
-    /**
-     * 显示确认对话框
-     * @param title 标题
-     * @param message 消息内容
-     * @return 用户是否确认
-     */
-    private boolean showConfirmationDialog(String title, String message) {
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
-    }
 
     /**
      * 显示错误对话框
