@@ -1,5 +1,7 @@
 package com.example.elepicture;
 
+import com.example.elepicture.utils.ClipboardManager;
+import com.example.elepicture.utils.FileOperator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -12,7 +14,9 @@ public class ImageManager extends Application {
     //private File currentDirectory = null;
     private ThumbnailManager thumbnailManager;
     private Label statusLabel;
-
+    // 初始化ClipboardManager和FileOperator
+    ClipboardManager clipboardManager = new ClipboardManager();
+    FileOperator fileOperator = new FileOperator(clipboardManager);
 
     @Override
     public void start(Stage primaryStage) {
@@ -38,7 +42,7 @@ public class ImageManager extends Application {
             if (newVal != null) {//当用户选择新节点时触发
                 File dir = newVal.getValue();//获取选中节点对应的目录文件对象
                 //currentDirectory = dir;
-                thumbnailManager.generateThumbnails(dir, imagePreviewPane, statusLabel);
+                thumbnailManager.generateThumbnails(dir, imagePreviewPane, statusLabel,fileOperator);
             }
         });
 

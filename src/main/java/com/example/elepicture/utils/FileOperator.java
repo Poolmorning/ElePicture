@@ -63,13 +63,14 @@ public class FileOperator {
         return true;
     }
 
-    /**
-     * 剪切文件到剪贴板
-     * @param sources 要剪切的文件列表
-     * @return 是否成功剪切
-     */
-    public boolean cut(List<File> sources) {
-        if (sources == null || sources.isEmpty()) {
+    //剪切文
+    public boolean cut(Set<VBox> selectedBoxes, HashMap<VBox, File> boxFileMap) {
+        //获取其中的文件
+        List<File> sources = selectedBoxes.stream()
+                .map(boxFileMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (sources.isEmpty()) {
             return false;
         }
 
@@ -80,10 +81,6 @@ public class FileOperator {
 
     //粘贴
     public boolean paste(File destination) {
-        if (!destination.isDirectory()) {
-            showErrorDialog("粘贴失败", "目标位置不是一个有效的目录");
-            return false;
-        }
         //从剪贴板管理器获取待粘贴的文件列表
         List<File> filesToPaste = clipboardManager.getClipboardFiles();
         // 检查剪贴板是否有文件
@@ -100,16 +97,10 @@ public class FileOperator {
                 if (clipboardManager.getOperationType() == ClipboardManager.OperationType.COPY) {
                     // 复制操作
                     Files.copy(source.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);//直接复制并覆盖已存在的文件
-                }/* else {
+                }else {
                     // 剪切操作
-                    if (source.isDirectory()) {
-                        copyDirectory(source, destFile);
-                        //deleteDirectory(source); // 剪切=复制+删除
-                    } else {
-                        Files.move(source.toPath(), destFile.toPath(),
-                                StandardCopyOption.REPLACE_EXISTING);
-                    }
-                }*/
+                    Files.move(source.toPath(), destFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 allSuccess = false;
@@ -163,72 +154,31 @@ public class FileOperator {
 
     }
 
-    /**
-     * 处理文件名冲突
-     * @param file 目标文件
-     * @return 处理后的文件对象
-     */
+    //处理文件名冲突
     private File handleNameConflict(File file) {
-        if (!file.exists()) {
+        if (!file.exists()) {//首先检查文件是否已存在
             return file;
         }
+        //分离文件名和扩展名
+        String name = file.getName();//获取完整文件名
+        String baseName;//主文件名
+        String extension = "";//后缀
+        int dotIndex = name.lastIndexOf('.');//最后一个点号位置
 
-        String name = file.getName();
-        String baseName;
-        String extension = "";
-        int dotIndex = name.lastIndexOf('.');
-
-        if (dotIndex > 0) {
-            baseName = name.substring(0, dotIndex);
-            extension = name.substring(dotIndex);
+        if (dotIndex > 0) {//确认点号不在开头位置
+            baseName = name.substring(0, dotIndex);//获取点号前的部分
+            extension = name.substring(dotIndex);//获取点号及之后的部分
         } else {
-            baseName = name;
+            baseName = name;//无扩展名时整个作为主文件名
         }
-
-        int counter = 1;
+        //副本文件名
+        int counter = 1;//起始序号
         File newFile;
         do {
-            newFile = new File(file.getParent(),
-                    baseName + " (" + counter + ")" + extension);
+            newFile = new File(file.getParent(), baseName + " (" + counter + ")" + extension);
             counter++;
-        } while (newFile.exists());
+        } while (newFile.exists());//循环直到生成不相同的文件名
 
         return newFile;
-    }
-
-    /**
-     * 递归复制目录
-     * @param source 源目录
-     * @param destination 目标目录
-     * @throws IOException
-     */
-    private void copyDirectory(File source, File destination) throws IOException {
-        if (!destination.exists()) {
-            destination.mkdir();
-        }
-
-        for (File file : source.listFiles()) {
-            if (file.isDirectory()) {
-                copyDirectory(file, new File(destination, file.getName()));
-            } else {
-                Files.copy(file.toPath(),
-                        new File(destination, file.getName()).toPath(),
-                        StandardCopyOption.REPLACE_EXISTING);
-            }
-        }
-    }
-
-
-    /**
-     * 显示错误对话框
-     * @param title 标题
-     * @param message 消息内容
-     */
-    private void showErrorDialog(String title, String message) {
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
