@@ -14,9 +14,9 @@ public class DirectoryTreeView extends TreeView<File> {
         setPrefWidth(200);
         initTree();
     }
-
+    //获取电脑所有磁盘根目录
     private void initTree() {
-        // 创建根节点"计算机"
+        // 创建根节点"此电脑"
         TreeItem<File> rootItem = new TreeItem<>(new File("此电脑"));
         rootItem.setExpanded(true);
 
@@ -38,17 +38,16 @@ public class DirectoryTreeView extends TreeView<File> {
         if (hasSubDirectories(directory)) {
             item.getChildren().add(new TreeItem<>());
 
-            // 设置展开监听器实现懒加载
+            // 设置展开监听器加载
             item.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
-                if (isNowExpanded && item.getChildren().size() == 1 &&
-                        item.getChildren().get(0).getValue() == null) {
+                if (isNowExpanded && item.getChildren().size() == 1 && item.getChildren().get(0).getValue() == null) {
                     loadSubDirectories(item);
                 }
             });
         }
         return item;
     }
-
+    // 加载子目录
     private void loadSubDirectories(TreeItem<File> parentItem) {
         File parentDir = parentItem.getValue();
         parentItem.getChildren().clear(); // 清除占位符
@@ -65,7 +64,7 @@ public class DirectoryTreeView extends TreeView<File> {
             }
         }
     }
-
+    // 检查目录是否有子目录
     private boolean hasSubDirectories(File dir) {
         if (dir == null || !dir.isDirectory()) {
             return false;
