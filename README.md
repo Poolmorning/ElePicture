@@ -17,8 +17,8 @@
 - 删除右键菜单     
 #### 4.20
 - 把ThumbnailManager类分出去了，但框住有移动
-- 右键菜单完成，其中操作功能暂时有问题，还没检查
-- 添加了ClipboardManager和FileOperator类，没人工注释
+- ~~右键菜单完成，其中操作功能暂时有问题，还没检查~~
+- ~~添加了ClipboardManager和FileOperator类，没人工注释~~
 - DirectoryTreeView，ThumbnailManager（除了showMenu）都已经人工检查写过注释
 - 调整图片框显得更整齐
 - 已完成基本的操作复制，粘贴，重命名，删除功能（但是还没完全按照要求完成，如多选图片进行操作，没完成框选）
