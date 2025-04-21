@@ -10,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.*;
 
+
 public class ImageManager extends Application {
     //private File currentDirectory = null;
     private ThumbnailManager thumbnailManager;

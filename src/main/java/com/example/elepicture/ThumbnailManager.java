@@ -144,6 +144,7 @@ public class ThumbnailManager {
         // 根据剪贴板状态设置粘贴项是否可用
         //pasteItem.setDisable(!clipboardManager.hasData());
 
+
         // 复制文件
         copyItem.setOnAction(event -> {
             fileOperator.copy(selectedBoxes, boxFileMap);

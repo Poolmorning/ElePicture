@@ -3,7 +3,6 @@ package com.example.elepicture.utils;
 import java.io.File;
 import java.util.List;
 
-
 //剪贴板管理类，用于存储复制/剪切的文件
 public class ClipboardManager {
     public enum OperationType {

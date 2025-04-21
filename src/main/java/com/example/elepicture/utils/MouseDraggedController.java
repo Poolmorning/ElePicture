@@ -1,14 +1,10 @@
 package com.example.elepicture.utils;
 
 import javafx.geometry.Bounds;
-import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.layout.VBox;
-
-import java.util.HashSet;
 import java.util.Set;
 
 public class MouseDraggedController {
