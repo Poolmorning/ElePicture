@@ -10,7 +10,7 @@
 - DirectoryTreeView，ThumbnailManager（除了showMenu）都已经人工检查写过注释
 - 调整图片框显得更整齐
 - 已完成基本的操作复制，粘贴，重命名，删除功能（但是还没完全按照要求完成，如多选图片进行操作，没完成框选）
-- 新添MouseDraggedddController类，但是暂时没用上
+- 新添MouseDraggedddController类，但是暂时没用上 
 #### 4.21
 - 修复右键菜单重复出现
 - 完成拖动，但只能左上到右下是正确的
