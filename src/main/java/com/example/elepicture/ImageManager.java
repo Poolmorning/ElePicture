@@ -29,7 +29,7 @@ public class ImageManager extends Application {
         imagePreviewPane.setPadding(new Insets(10));
         imagePreviewPane.setHgap(10);
         imagePreviewPane.setVgap(10);
-        imagePreviewPane.setPrefWrapLength(750); // 设置每行的宽度
+        //imagePreviewPane.setPrefWrapLength(750); // 设置每行的宽度
         thumbnailManager = new ThumbnailManager();
         // 状态标签
         statusLabel = new Label("请选择一个目录查看图片。");
@@ -53,7 +53,7 @@ public class ImageManager extends Application {
 
         BorderPane mainLayout = new BorderPane();
         mainLayout.setLeft(leftPane);
-        mainLayout.setCenter(new ScrollPane(imagePreviewPane));
+        mainLayout.setCenter(imageScrollPane);
         mainLayout.setBottom(statusLabel);
 
 

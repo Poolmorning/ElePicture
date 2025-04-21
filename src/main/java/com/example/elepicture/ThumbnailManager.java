@@ -33,7 +33,7 @@ public class ThumbnailManager {
     private final Set<VBox> allThumbnails = new HashSet<>(); //保存所有缩略图
 
 
-    public void generateThumbnails(File dir, Pane imagePreviewPane, Label statusLabel,FileOperator fileOperator) {
+    public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel,FileOperator fileOperator) {
         if (dir != null) {//如果所选不为空
             File[] files = dir.listFiles();//获取目录下的所有文件
             if (files != null) {//如果目录下有文件
@@ -73,6 +73,7 @@ public class ThumbnailManager {
                         //box.setPickOnBounds(false);
                         box.setSpacing(5);
                         box.setPadding(new Insets(5));
+                        //box.setStyle("-fx-background-color: lightblue;");// 设置背景颜⾊
                         box.setStyle("-fx-border-color: transparent;");
                         // 初始化鼠标拖动控制器
                         MouseDraggedController mouseDraggedController = new MouseDraggedController(container, allThumbnails,selectedBoxes);
@@ -208,13 +209,13 @@ public class ThumbnailManager {
             box.setStyle("-fx-border-color: transparent;");
             selectedBoxes.remove(box);
         } else {
-            box.setStyle("-fx-border-color: orange; -fx-border-width: 2px;");
+            box.setStyle("-fx-border-color: orange; -fx-border-width: 1px;");
             selectedBoxes.add(box);
         }
     }
     //选中状态
     private void selectBox(VBox box) {
-        box.setStyle("-fx-border-color: orange; -fx-border-width: 2px;");
+        box.setStyle("-fx-border-color: orange; -fx-border-width: 1px;");
         selectedBoxes.add(box);
     }
     //清空选中状态
