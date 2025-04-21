@@ -1,9 +1,7 @@
 package com.example.elepicture.utils;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 
 import java.io.File;
@@ -114,11 +112,12 @@ public class FileOperator {
 
     //重命名
     public boolean rename(Set<VBox> selectedBoxes, HashMap<VBox, File> boxFileMap) {
-        File oldFile = boxFileMap.get(selectedBoxes.iterator().next());
-        boolean success = false;
-        if (oldFile == null) return success;
+
         //如果只选中了一个文件
         if (selectedBoxes.size() == 1){
+            File oldFile = boxFileMap.get(selectedBoxes.iterator().next());//获取第一个图片
+            boolean success = false;
+            if (oldFile == null) return success;
             // 获取不带后缀的文件名
             String oldName = oldFile.getName();
             int dotIndex = oldName.lastIndexOf('.');
@@ -148,10 +147,101 @@ public class FileOperator {
             success = oldFile.renameTo(newFile);
             return success;
 
-        }
-        //如果选中了多个文件
-        return true;
+        } else{//如果选中了多个文件
+            List<File> selectedFiles = selectedBoxes.stream()
+                    .map(boxFileMap::get)
+                    .filter(Objects::nonNull)
+                    .toList();//获取所有图片
+            // 创建批量重命名对话框
+            VBox dialogContent = new VBox(10);
+            TextField prefixField = new TextField();
+            prefixField.setPromptText("名称前缀");
+            TextField startNumberField = new TextField("1");
+            startNumberField.setPromptText("起始编号");
+            TextField digitsField = new TextField("4");
+            digitsField.setPromptText("编号位数");
+            dialogContent.getChildren().addAll(
+                new Label("名称前缀:"), prefixField,
+                new Label("起始编号:"), startNumberField,
+                new Label("编号位数:"), digitsField
+            );
 
+            Alert dialog = new Alert(AlertType.CONFIRMATION);
+            dialog.setTitle("批量重命名");
+            dialog.setHeaderText("请输入批量重命名参数");
+            dialog.getDialogPane().setContent(dialogContent);
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.isEmpty() || result.get() != ButtonType.OK) {
+                return false; // 用户取消
+            }
+
+            // 获取用户输入
+            String prefix = prefixField.getText().trim();
+            if (prefix.isEmpty()) {
+                showErrorAlert("名称前缀不能为空");
+                return false;
+            }
+            int startNumber;
+            try {
+                startNumber = Integer.parseInt(startNumberField.getText());
+                if (startNumber < 0) {
+                    showErrorAlert("起始编号必须大于等于0");
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                showErrorAlert("起始编号必须是整数");
+                return false;
+            }
+            int digits;
+            try {
+                digits = Integer.parseInt(digitsField.getText());
+                if (digits <= 0) {
+                    showErrorAlert("编号位数必须大于0");
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                showErrorAlert("编号位数必须是整数");
+                return false;
+            }
+            // 执行批量重命名
+            boolean allSuccess = true;
+            int currentNumber = startNumber;
+            for (File file : selectedFiles) {
+                // 获取文件扩展名
+                String oldName = file.getName();
+                int dotIndex = oldName.lastIndexOf('.');
+                String extension = (dotIndex > 0) ? oldName.substring(dotIndex) : "";
+
+                // 生成序号部分
+                String numberStr = String.format("%0" + digits + "d", currentNumber);
+
+                // 构建新文件名
+                String newName = prefix + numberStr + extension;
+                File newFile = new File(file.getParentFile(), newName);
+
+                // 检查是否重命名到自己
+                if (!file.equals(newFile)) {
+                    // 执行重命名
+                    if (!file.renameTo(newFile)) {
+                        allSuccess = false;
+                    }
+                }
+
+                currentNumber++;
+            }
+            return allSuccess;
+        }
+
+
+    }
+    //错误提示
+    private void showErrorAlert(String message) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("错误");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     //处理文件名冲突
