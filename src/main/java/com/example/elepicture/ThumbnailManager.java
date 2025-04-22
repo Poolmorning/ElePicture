@@ -31,11 +31,13 @@ public class ThumbnailManager {
     private long totalSize = 0;//总大小
     private ContextMenu contextMenu;//右键菜单
     private final Set<VBox> allThumbnails = new HashSet<>(); //保存所有缩略图
+    private FlowPane thisPane; // 当前的FlowPane
     private List<File> currentImageFiles;  // 新增：保存当前目录的图片列表
 
 
     public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel, FileOperator fileOperator) {
         if (dir != null) {//如果所选不为空
+            thisPane = imagePreviewPane; // 保存当前的FlowPane
             File[] files = dir.listFiles();//获取目录下的所有文件
             if (files != null) {//如果目录下有文件
                 imagePreviewPane.getChildren().clear();//清空预览面板
@@ -176,7 +178,7 @@ public class ThumbnailManager {
         cutItem.setOnAction(event -> {
             fileOperator.cut(selectedBoxes, boxFileMap);
             statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
-            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel, fileOperator);
+            generateThumbnails(currentDir, thisPane, statusLabel, fileOperator);
         });
 
 
@@ -185,7 +187,7 @@ public class ThumbnailManager {
             fileOperator.paste(currentDir);
             statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
             // 刷新显示
-            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel, fileOperator);
+            generateThumbnails(currentDir, thisPane, statusLabel, fileOperator);
         });
 
         // 删除文件
@@ -196,14 +198,14 @@ public class ThumbnailManager {
                 throw new RuntimeException(e);
             }
             // 刷新显示
-            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel, fileOperator);
+            generateThumbnails(currentDir, thisPane, statusLabel, fileOperator);
         });
 
         //重命名文件
         renameItem.setOnAction(event -> {
             fileOperator.rename(selectedBoxes, boxFileMap);
             //刷新显示
-            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel, fileOperator);
+            generateThumbnails(currentDir, thisPane, statusLabel, fileOperator);
         });
         //防止菜单重复创建
         if (contextMenu == null) {
