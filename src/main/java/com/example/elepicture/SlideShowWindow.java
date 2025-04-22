@@ -126,16 +126,15 @@ public class SlideShowWindow {
         if (imageWidth > maxWidth || imageHeight > maxHeight){
             imageWidth = maxWidth * zoomFactor;
             imageHeight = maxHeight * zoomFactor;
-            //currentZoomLevel--;
         }
         //检查缩放后的图片是否超出窗口可用空间
         if (imageWidth > maxWidth || imageHeight > maxHeight) {// 如果超出，计算保持宽高比的最大缩放比例
             double ratio = Math.min(maxWidth / imageWidth, maxHeight / imageHeight);
-
+            currentZoomLevel--;
             imageView.setFitWidth(imageWidth*ratio);
             imageView.setFitHeight(imageHeight*ratio);
-            System.out.println("maxWidth * ratio " + imageWidth*ratio);
-            System.out.println("maxHeight * ratio " +imageWidth*ratio);
+            //System.out.println("maxWidth * ratio " + imageWidth*ratio);
+            //System.out.println("maxHeight * ratio " +imageWidth*ratio);
 
         } else {// 如果没有超出窗口，直接使用缩放后的原始尺寸
             imageView.setFitWidth(imageWidth);
