@@ -120,16 +120,22 @@ public class SlideShowWindow {
         double maxHeight = scene.getHeight() - 100;
         //根据当前缩放级别计算图片的实际宽度和高度
         double zoomFactor = zoomLevels[currentZoomLevel];
-        double imageWidth = imageView.getImage().getWidth() * zoomFactor;
-        double imageHeight = imageView.getImage().getHeight() * zoomFactor;
+        double imageWidth = imageView.getImage().getWidth();
+        double imageHeight = imageView.getImage().getHeight();
+        //检查缩放后的图片是否超出窗口可用空间,按照最大宽高比缩放
+        if (imageWidth > maxWidth || imageHeight > maxHeight){
+            imageWidth = maxWidth * zoomFactor;
+            imageHeight = maxHeight * zoomFactor;
+            //currentZoomLevel--;
+        }
         //检查缩放后的图片是否超出窗口可用空间
         if (imageWidth > maxWidth || imageHeight > maxHeight) {// 如果超出，计算保持宽高比的最大缩放比例
-            //double ratio = Math.min(maxWidth / imageWidth, maxHeight / imageHeight);
+            double ratio = Math.min(maxWidth / imageWidth, maxHeight / imageHeight);
 
-            imageView.setFitWidth(maxWidth*zoomFactor);
-            imageView.setFitHeight(maxHeight*zoomFactor);
-            System.out.println("maxWidth * ratio " + imageWidth * zoomFactor);
-            System.out.println("maxHeight * ratio " +imageHeight * zoomFactor);
+            imageView.setFitWidth(imageWidth*ratio);
+            imageView.setFitHeight(imageHeight*ratio);
+            System.out.println("maxWidth * ratio " + imageWidth*ratio);
+            System.out.println("maxHeight * ratio " +imageWidth*ratio);
 
         } else {// 如果没有超出窗口，直接使用缩放后的原始尺寸
             imageView.setFitWidth(imageWidth);
