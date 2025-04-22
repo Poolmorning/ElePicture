@@ -91,7 +91,7 @@ public class MouseDraggedController {
                     boxMaxY < rectMinY || boxMinY > rectMaxY);
 
             if (overlaps) {
-                box.setStyle("-fx-border-color: orange; -fx-border-width: 1px;");
+                box.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: lightblue;");
                 selectedBoxes.add(box);
             }
         }

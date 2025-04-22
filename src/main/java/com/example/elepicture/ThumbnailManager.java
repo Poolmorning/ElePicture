@@ -31,6 +31,7 @@ public class ThumbnailManager {
     private long totalSize = 0;//总大小
     private ContextMenu contextMenu;//右键菜单
     private final Set<VBox> allThumbnails = new HashSet<>(); //保存所有缩略图
+    private List<File> currentImageFiles;  // 新增：保存当前目录的图片列表
 
 
 
@@ -49,6 +50,9 @@ public class ThumbnailManager {
                 // 添加空白处点击事件
                 imagePreviewPane.setOnMouseClicked(event -> {
                     if (event.getButton() == MouseButton.PRIMARY && event.getTarget() == imagePreviewPane) {
+                        if (contextMenu != null) {
+                            contextMenu.hide();
+                        }
                         clearSelection();
                         statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize));
                     } else if(event.getButton() == MouseButton.SECONDARY && event.getTarget() == imagePreviewPane){
@@ -84,8 +88,11 @@ public class ThumbnailManager {
                         //box.setPickOnBounds(false);
                         box.setSpacing(5);
                         box.setPadding(new Insets(5));
-                        //box.setStyle("-fx-background-color: lightblue;");// 设置背景颜⾊
                         box.setStyle("-fx-border-color: transparent;");
+
+                        // 双击事件处理
+                        setupDoubleClickHandler(box, dir, statusLabel);
+
                         // 初始化鼠标拖动控制器
                         MouseDraggedController mouseDraggedController = new MouseDraggedController(container, allThumbnails,selectedBoxes);
                         boxFileMap.put(box, file);
@@ -94,6 +101,9 @@ public class ThumbnailManager {
                         //设置鼠标点击事件
                         box.setOnMouseClicked(event -> {
                             if (event.getButton() == MouseButton.PRIMARY) {//如果是左键点击
+                                if (contextMenu != null) {
+                                    contextMenu.hide();
+                                }
 
                                 if (event.isControlDown()) {//如果按下Ctrl键
                                     toggleSelectBox(box);//切换选中状态
@@ -224,13 +234,13 @@ public class ThumbnailManager {
             box.setStyle("-fx-border-color: transparent;");
             selectedBoxes.remove(box);
         } else {
-            box.setStyle("-fx-border-color: orange; -fx-border-width: 1px;");
+            box.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: lightblue;");
             selectedBoxes.add(box);
         }
     }
     //选中状态
     private void selectBox(VBox box) {
-        box.setStyle("-fx-border-color: orange; -fx-border-width: 1px;");
+        box.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: lightblue;");
         selectedBoxes.add(box);
     }
     //清空选中状态
@@ -255,5 +265,37 @@ public class ThumbnailManager {
         } else {//如果小于1KB
             return size + " B";
         }
+    }
+
+    // 获取当前目录的所有图片文件
+    public List<File> getCurrentDirectoryImages(File dir) {
+        List<File> imageFiles = new ArrayList<>();
+        if (dir != null && dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (isImageFile(file)) {
+                        imageFiles.add(file);
+                    }
+                }
+            }
+        }
+        return imageFiles;
+    }
+
+    // 通过双击缩略图进入幻灯片播放
+    private void setupDoubleClickHandler(VBox box, File dir, Label statusLabel) {
+        box.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                List<File> imageFiles = getCurrentDirectoryImages(dir);
+                if (!imageFiles.isEmpty()) {
+                    int index = imageFiles.indexOf(boxFileMap.get(box));
+                    if (index >= 0) {
+                        SlideShowWindow slideShow = new SlideShowWindow(imageFiles, index);
+                        slideShow.show();
+                    }
+                }
+            }
+        });
     }
 }
