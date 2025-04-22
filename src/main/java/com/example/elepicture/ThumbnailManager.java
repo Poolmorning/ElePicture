@@ -33,6 +33,7 @@ public class ThumbnailManager {
     private final Set<VBox> allThumbnails = new HashSet<>(); //保存所有缩略图
 
 
+
     public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel,FileOperator fileOperator) {
         if (dir != null) {//如果所选不为空
             File[] files = dir.listFiles();//获取目录下的所有文件
@@ -45,7 +46,17 @@ public class ThumbnailManager {
                 count = 0;
                 totalSize = 0;
 
-
+                // 添加空白处点击事件
+                imagePreviewPane.setOnMouseClicked(event -> {
+                    if (event.getButton() == MouseButton.PRIMARY && event.getTarget() == imagePreviewPane) {
+                        clearSelection();
+                        statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize));
+                    } else if(event.getButton() == MouseButton.SECONDARY && event.getTarget() == imagePreviewPane){
+                        clearSelection();
+                        showMenu(dir,null, event.getScreenX(), event.getScreenY(),statusLabel,fileOperator,imagePreviewPane);//显示右键菜单
+                        statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize));
+                    }
+                });
 
                 for (File file : files) {//遍历文件
                     if (isImageFile(file)) {//如果是图片文件
@@ -98,10 +109,11 @@ public class ThumbnailManager {
                                 }
                                 selectBox(box);//选中当前框
                                 //显示右键菜单
-                                showMenu(box, event.getScreenX(), event.getScreenY(),statusLabel,fileOperator);//显示右键菜单
+                                showMenu(dir,box, event.getScreenX(), event.getScreenY(),statusLabel,fileOperator,imagePreviewPane);//显示右键菜单
 
                             }
                         });
+
                         //添加图片框到预览面板
                         imagePreviewPane.getChildren().add(box);
                         count++;//增加计数器
@@ -117,7 +129,6 @@ public class ThumbnailManager {
                     }
                 }
 
-
                 //标签显示信息
                 String readableSize = formatSize(totalSize);//把总大小格式化为可读的字符串
                 statusLabel.setText(String.format("共 %d 张图片，总大小：%s",
@@ -127,13 +138,14 @@ public class ThumbnailManager {
     }
 
     //显示右键菜单
-    private void showMenu(VBox box, double x, double y,Label statusLabel,FileOperator fileOperator) {
+    private void showMenu(File currentDir,VBox box, double x, double y,Label statusLabel,FileOperator fileOperator,FlowPane imagePreviewPane) {
         if (contextMenu != null) {
             contextMenu.hide();
         }
+
         // 获取当前选中的文件
         File currentFile = boxFileMap.get(box);
-        File currentDir = currentFile.getParentFile();
+
 
         // 创建菜单项
         MenuItem copyItem = new MenuItem("复制");
@@ -144,7 +156,6 @@ public class ThumbnailManager {
 
         // 根据剪贴板状态设置粘贴项是否可用
         //pasteItem.setDisable(!clipboardManager.hasData());
-
 
         // 复制文件
         copyItem.setOnAction(event -> {
@@ -193,6 +204,10 @@ public class ThumbnailManager {
         }
         // 显示菜单
         contextMenu.show(box, x, y);
+        if (box==null){
+            contextMenu.show(imagePreviewPane, x, y);;
+        }
+
 
     }
     //获取当前选中的所有文件
