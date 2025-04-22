@@ -34,8 +34,7 @@ public class ThumbnailManager {
     private List<File> currentImageFiles;  // 新增：保存当前目录的图片列表
 
 
-
-    public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel,FileOperator fileOperator) {
+    public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel, FileOperator fileOperator) {
         if (dir != null) {//如果所选不为空
             File[] files = dir.listFiles();//获取目录下的所有文件
             if (files != null) {//如果目录下有文件
@@ -55,9 +54,9 @@ public class ThumbnailManager {
                         }
                         clearSelection();
                         statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize));
-                    } else if(event.getButton() == MouseButton.SECONDARY && event.getTarget() == imagePreviewPane){
+                    } else if (event.getButton() == MouseButton.SECONDARY && event.getTarget() == imagePreviewPane) {
                         clearSelection();
-                        showMenu(dir,null, event.getScreenX(), event.getScreenY(),statusLabel,fileOperator,imagePreviewPane);//显示右键菜单
+                        showMenu(dir, null, event.getScreenX(), event.getScreenY(), statusLabel, fileOperator, imagePreviewPane);//显示右键菜单
                         statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize));
                     }
                 });
@@ -91,10 +90,10 @@ public class ThumbnailManager {
                         box.setStyle("-fx-border-color: transparent;");
 
                         // 双击事件处理
-                        setupDoubleClickHandler(box, dir, statusLabel);
+                        setupDoubleClickHandler(box, dir);
 
                         // 初始化鼠标拖动控制器
-                        MouseDraggedController mouseDraggedController = new MouseDraggedController(container, allThumbnails,selectedBoxes);
+                        MouseDraggedController mouseDraggedController = new MouseDraggedController(container, allThumbnails, selectedBoxes);
                         boxFileMap.put(box, file);
                         allThumbnails.add(box); // 添加到所有缩略图集合
 
@@ -119,7 +118,7 @@ public class ThumbnailManager {
                                 }
                                 selectBox(box);//选中当前框
                                 //显示右键菜单
-                                showMenu(dir,box, event.getScreenX(), event.getScreenY(),statusLabel,fileOperator,imagePreviewPane);//显示右键菜单
+                                showMenu(dir, box, event.getScreenX(), event.getScreenY(), statusLabel, fileOperator, imagePreviewPane);//显示右键菜单
 
                             }
                         });
@@ -148,7 +147,7 @@ public class ThumbnailManager {
     }
 
     //显示右键菜单
-    private void showMenu(File currentDir,VBox box, double x, double y,Label statusLabel,FileOperator fileOperator,FlowPane imagePreviewPane) {
+    private void showMenu(File currentDir, VBox box, double x, double y, Label statusLabel, FileOperator fileOperator, FlowPane imagePreviewPane) {
         if (contextMenu != null) {
             contextMenu.hide();
         }
@@ -177,7 +176,7 @@ public class ThumbnailManager {
         cutItem.setOnAction(event -> {
             fileOperator.cut(selectedBoxes, boxFileMap);
             statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
-            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel,fileOperator);
+            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel, fileOperator);
         });
 
 
@@ -186,7 +185,7 @@ public class ThumbnailManager {
             fileOperator.paste(currentDir);
             statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
             // 刷新显示
-            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel,fileOperator);
+            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel, fileOperator);
         });
 
         // 删除文件
@@ -197,29 +196,31 @@ public class ThumbnailManager {
                 throw new RuntimeException(e);
             }
             // 刷新显示
-            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel,fileOperator);
+            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel, fileOperator);
         });
 
         //重命名文件
         renameItem.setOnAction(event -> {
             fileOperator.rename(selectedBoxes, boxFileMap);
             //刷新显示
-            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel,fileOperator);
+            generateThumbnails(currentDir, (FlowPane) box.getParent(), statusLabel, fileOperator);
         });
         //防止菜单重复创建
-        if (contextMenu == null){
+        if (contextMenu == null) {
             contextMenu = new ContextMenu();
             // 添加菜单项到上下文菜单
             contextMenu.getItems().addAll(copyItem, cutItem, pasteItem, deleteItem, renameItem);
         }
         // 显示菜单
         contextMenu.show(box, x, y);
-        if (box==null){
-            contextMenu.show(imagePreviewPane, x, y);;
+        if (box == null) {
+            contextMenu.show(imagePreviewPane, x, y);
+            ;
         }
 
 
     }
+
     //获取当前选中的所有文件
     private List<File> getSelectedFiles() {
         List<File> selectedFiles = new ArrayList<>();
@@ -228,6 +229,7 @@ public class ThumbnailManager {
         }
         return selectedFiles;
     }
+
     //按下Ctrl键切换选中状态
     private void toggleSelectBox(VBox box) {
         if (selectedBoxes.contains(box)) {
@@ -238,11 +240,13 @@ public class ThumbnailManager {
             selectedBoxes.add(box);
         }
     }
+
     //选中状态
     private void selectBox(VBox box) {
         box.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: lightblue;");
         selectedBoxes.add(box);
     }
+
     //清空选中状态
     private void clearSelection() {
         for (VBox box : selectedBoxes) {
@@ -250,11 +254,13 @@ public class ThumbnailManager {
         }
         selectedBoxes.clear();
     }
+
     //判断是否是图片文件
     private boolean isImageFile(File file) {
         String name = file.getName().toLowerCase();
         return Arrays.stream(imageExtensions).anyMatch(name::endsWith);
     }
+
     //格式化大小
     private String formatSize(long size) {
         DecimalFormat df = new DecimalFormat("0.00");
@@ -283,14 +289,31 @@ public class ThumbnailManager {
         return imageFiles;
     }
 
-    // 通过双击缩略图进入幻灯片播放
-    private void setupDoubleClickHandler(VBox box, File dir, Label statusLabel) {
+    /**
+     * 设置缩略图的双击事件处理器，用于进入幻灯片播放模式
+     *
+     * @param box         缩略图的VBox容器
+     * @param dir         当前目录文件对象
+     */
+    private void setupDoubleClickHandler(VBox box, File dir) {
+        // 为缩略图容器设置鼠标点击事件监听器
         box.setOnMouseClicked(event -> {
+            // 检查是否是鼠标左键的双击事件
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                // 获取当前目录下的所有图片文件
                 List<File> imageFiles = getCurrentDirectoryImages(dir);
+
+                // 确保目录中有图片文件
                 if (!imageFiles.isEmpty()) {
+                    // 获取当前点击的缩略图对应的文件在列表中的索引位置
+                    // boxFileMap保存了VBox到File的映射关系
                     int index = imageFiles.indexOf(boxFileMap.get(box));
+
+                    // 确保找到了对应的文件索引
                     if (index >= 0) {
+                        // 创建并显示幻灯片播放窗口
+                        // 参数1: 所有图片文件的列表
+                        // 参数2: 当前点击图片的索引位置
                         SlideShowWindow slideShow = new SlideShowWindow(imageFiles, index);
                         slideShow.show();
                     }

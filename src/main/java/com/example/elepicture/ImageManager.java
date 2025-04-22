@@ -59,35 +59,60 @@ public class ImageManager extends Application {
             }
         });
 
-        // 初始化幻灯片播放按钮
+        /*
+         * 初始化幻灯片播放按钮
+         * 该按钮用于启动当前目录的幻灯片播放功能，从第一张图片开始播放
+         */
         Button slideShowButton = new Button("幻灯片播放");
+
+// 设置按钮样式：
+// - 字体大小14像素
+// - 红色背景(#ff4444)
+// - 白色文字
         slideShowButton.setStyle("-fx-font-size: 14px; -fx-background-color: #ff4444; -fx-text-fill: white;");
+
+// 设置按钮点击事件处理
         slideShowButton.setOnAction(e -> {
+            // 1. 获取目录树中当前选中的节点
             TreeItem<File> selectedItem = directoryTree.getSelectionModel().getSelectedItem();
+
+            // 检查是否有选中的目录
             if (selectedItem != null) {
+                // 2. 获取选中节点对应的目录文件对象
                 File dir = selectedItem.getValue();
+
+                // 3. 通过缩略图管理器获取当前目录下的所有图片文件
                 List<File> imageFiles = thumbnailManager.getCurrentDirectoryImages(dir);
+
+                // 检查目录中是否存在图片文件
                 if (!imageFiles.isEmpty()) {
+                    // 4. 创建幻灯片播放窗口
+                    // 参数1: 图片文件列表
+                    // 参数2: 起始图片索引(0表示从第一张开始)
                     SlideShowWindow slideShow = new SlideShowWindow(imageFiles, 0);
+
+                    // 5. 显示幻灯片播放窗口
                     slideShow.show();
                 }
             }
         });
 
         // 布局组装
-        // 将按钮和状态标签放入HBox
         HBox bottomPanel = new HBox(10, slideShowButton, statusLabel);
         bottomPanel.setAlignment(Pos.CENTER_LEFT);
         bottomPanel.setPadding(new Insets(5));
         bottomPanel.setStyle("-fx-background-color: #f0f0f0;");
+
         VBox leftPane = new VBox(directoryTree);
         VBox.setVgrow(directoryTree, Priority.ALWAYS);// 目录树填充左侧剩余空间
 
+        HBox bf =new HBox(statusLabel,bottomPanel);
         BorderPane mainLayout = new BorderPane();
         mainLayout.setLeft(leftPane);
-        mainLayout.setCenter(imagePreviewPane);
-        mainLayout.setBottom(statusLabel);
-        mainLayout.setBottom(bottomPanel);
+        mainLayout.setCenter(imageScrollPane);
+        mainLayout.setBottom(bf);
+        //mainLayout.setBottom();
+
         // 创建场景并显示窗口
         Scene scene = new Scene(mainLayout, 1000, 700);
         primaryStage.setTitle("电子图片管理程序");
