@@ -188,8 +188,23 @@ public class SlideShowWindow {
     }
 
     private void showAlert(String message) {
-        // 可以在这里实现一个简单的提示，比如在状态栏显示
-        System.out.println(message);
+        // 创建提示标签
+        Label alertLabel = new Label(message);
+        alertLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.7); -fx-padding: 10px;");
+        alertLabel.setAlignment(Pos.CENTER);
+
+        // 将标签添加到StackPane中（确保它在图片上方）
+        StackPane imagePane = (StackPane) ((BorderPane) scene.getRoot()).getCenter();
+        imagePane.getChildren().add(alertLabel);
+        StackPane.setAlignment(alertLabel, Pos.CENTER);
+
+        // 创建1秒后消失的动画
+        Timeline fadeTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), e -> {
+                    imagePane.getChildren().remove(alertLabel);
+                })
+        );
+        fadeTimeline.play();
     }
 
     public void show() {

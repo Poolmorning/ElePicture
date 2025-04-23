@@ -1,6 +1,7 @@
 package com.example.elepicture.utils;
 
 import javafx.geometry.Bounds;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -60,16 +61,19 @@ public class MouseDraggedController {
 
         // 鼠标释放事件
         parentPane.setOnMouseReleased(event -> {
-            selectionRect.setVisible(false);
+            selectionRect.setVisible(false);//隐藏选择矩形
         });
     }
 
     private void updateSelectedBoxes(Set<VBox> selectedBoxes) {
         // 清除之前的选择样式
-        for (VBox box : selectedBoxes) {
-            box.setStyle("-fx-border-color: transparent;");
-        }
-        selectedBoxes.clear();
+        //if (!event.isControlDown()) {
+            for (VBox box : selectedBoxes) {
+                box.setStyle("-fx-border-color: transparent;");
+            }
+            //selectedBoxes.clear();
+        //}
+
 
         // 获取选择矩形的边界
         double rectMinX = selectionRect.getX();
@@ -92,6 +96,7 @@ public class MouseDraggedController {
 
             if (overlaps) {
                 box.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: lightblue;");
+
                 selectedBoxes.add(box);
             }
         }

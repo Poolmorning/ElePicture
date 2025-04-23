@@ -7,14 +7,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.*;
 import java.util.List;
 
-/**
- * 电子图片管理程序的主类，负责初始化用户界面并协调目录树、缩略图预览和文件操作
- */
+
+ //电子图片管理程序的主类
 public class ImageManager extends Application {
     // 缩略图管理器，负责生成和显示图片缩略图
     private ThumbnailManager thumbnailManager;
@@ -44,8 +45,6 @@ public class ImageManager extends Application {
         statusLabel.setPadding(new Insets(5));
         statusLabel.setStyle("-fx-background-color: #f0f0f0;");
 
-
-
         // 将缩略图区域包装到滚动面板中
         ScrollPane imageScrollPane = new ScrollPane(imagePreviewPane);
         imageScrollPane.setFitToWidth(true);
@@ -59,39 +58,31 @@ public class ImageManager extends Application {
             }
         });
 
-        /*
-         * 初始化幻灯片播放按钮
-         * 该按钮用于启动当前目录的幻灯片播放功能，从第一张图片开始播放
-         */
-        Button slideShowButton = new Button("幻灯片播放");
+        //初始化幻灯片播放按钮
+        Image play = new Image("D:\\JAVA Program\\ElePicture\\src\\main\\resources\\image\\24gf-playCircle-copy.png");//不知道为什么相对路径用不了？
+        ImageView playIcon = new ImageView(play);
+        playIcon.setFitWidth(15);
+        playIcon.setFitHeight(15);
+        Button slideShowButton = new Button(/*"幻灯片播放"*/);
+        slideShowButton.setGraphic(playIcon);
+        //设置按钮大小
+        slideShowButton.setMinSize(30, 16);
+        slideShowButton.setMaxSize(30, 16);
 
-// 设置按钮样式：
-// - 字体大小14像素
-// - 红色背景(#ff4444)
-// - 白色文字
-        slideShowButton.setStyle("-fx-font-size: 14px; -fx-background-color: #ff4444; -fx-text-fill: white;");
-
-// 设置按钮点击事件处理
+        //点击事件处理
         slideShowButton.setOnAction(e -> {
-            // 1. 获取目录树中当前选中的节点
+            //获取目录树中当前选中的节点
             TreeItem<File> selectedItem = directoryTree.getSelectionModel().getSelectedItem();
-
-            // 检查是否有选中的目录
+            //检查是否有选中的目录
             if (selectedItem != null) {
-                // 2. 获取选中节点对应的目录文件对象
+                // 获取选中节点对应的目录文件对象
                 File dir = selectedItem.getValue();
 
-                // 3. 通过缩略图管理器获取当前目录下的所有图片文件
+                //获取当前目录下的所有图片文件
                 List<File> imageFiles = thumbnailManager.getCurrentDirectoryImages(dir);
-
-                // 检查目录中是否存在图片文件
+                //检查目录中是否存在图片文件
                 if (!imageFiles.isEmpty()) {
-                    // 4. 创建幻灯片播放窗口
-                    // 参数1: 图片文件列表
-                    // 参数2: 起始图片索引(0表示从第一张开始)
                     SlideShowWindow slideShow = new SlideShowWindow(imageFiles, 0);
-
-                    // 5. 显示幻灯片播放窗口
                     slideShow.show();
                 }
             }
@@ -103,10 +94,14 @@ public class ImageManager extends Application {
         bottomPanel.setPadding(new Insets(5));
         bottomPanel.setStyle("-fx-background-color: #f0f0f0;");
 
+        // 添加间隔区域使按钮右对齐
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS); // 关键：让间隔区域自动扩展
+
         VBox leftPane = new VBox(directoryTree);
         VBox.setVgrow(directoryTree, Priority.ALWAYS);// 目录树填充左侧剩余空间
 
-        HBox bf =new HBox(statusLabel,bottomPanel);
+        HBox bf =new HBox(statusLabel,spacer,bottomPanel);
         BorderPane mainLayout = new BorderPane();
         mainLayout.setLeft(leftPane);
         mainLayout.setCenter(imageScrollPane);

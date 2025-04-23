@@ -1,23 +1,15 @@
 package com.example.elepicture;
 
 import com.example.elepicture.utils.FileOperator;
-import com.example.elepicture.utils.MouseDraggedController;
-import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.input.MouseButton;
 import javafx.geometry.Insets;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -32,8 +24,6 @@ public class ThumbnailManager {
     private ContextMenu contextMenu;//右键菜单
     private final Set<VBox> allThumbnails = new HashSet<>(); //保存所有缩略图
     private FlowPane thisPane; // 当前的FlowPane
-    private List<File> currentImageFiles;  // 新增：保存当前目录的图片列表
-
 
     public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel, FileOperator fileOperator) {
         if (dir != null) {//如果所选不为空
@@ -95,7 +85,7 @@ public class ThumbnailManager {
                         setupDoubleClickHandler(box, dir);
 
                         // 初始化鼠标拖动控制器
-                        MouseDraggedController mouseDraggedController = new MouseDraggedController(container, allThumbnails, selectedBoxes);
+                        //MouseDraggedController mouseDraggedController = new MouseDraggedController(container, allThumbnails, selectedBoxes);
                         boxFileMap.put(box, file);
                         allThumbnails.add(box); // 添加到所有缩略图集合
 
@@ -108,9 +98,11 @@ public class ThumbnailManager {
 
                                 if (event.isControlDown()) {//如果按下Ctrl键
                                     toggleSelectBox(box);//切换选中状态
+
                                 } else {
                                     clearSelection();//清空选中状态
                                     selectBox(box);//选中当前框
+
                                 }
 
                                 statusLabel.setText("已选中 " + selectedBoxes.size() + " 张图片");
@@ -131,12 +123,12 @@ public class ThumbnailManager {
                         totalSize += file.length();//增加总大小
 
                         // 添加鼠标释放事件处理，更新状态标签
-                        imagePreviewPane.setOnMouseReleased(event -> {
+                        /*imagePreviewPane.setOnMouseReleased(event -> {
                             if (!mouseDraggedController.getSelectedBoxes(selectedBoxes).isEmpty()) {
-                                selectedBoxes.addAll(mouseDraggedController.getSelectedBoxes(selectedBoxes));
+                                //selectedBoxes.addAll(mouseDraggedController.getSelectedBoxes(selectedBoxes));
                                 statusLabel.setText("已选中 " + selectedBoxes.size() + " 张图片");
                             }
-                        });
+                        });*/
                     }
                 }
 
