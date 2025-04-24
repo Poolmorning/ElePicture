@@ -59,7 +59,7 @@ public class ImageManager extends Application {
         });
 
         //初始化幻灯片播放按钮
-        Image play = new Image("D:\\JAVA Program\\ElePicture\\src\\main\\resources\\image\\24gf-playCircle-copy.png");//不知道为什么相对路径用不了？
+        Image play = new Image(getClass().getResourceAsStream("/image/24gf-playCircle-copy.png"));//不知道为什么相对路径用不了？
         ImageView playIcon = new ImageView(play);
         playIcon.setFitWidth(15);
         playIcon.setFitHeight(15);
