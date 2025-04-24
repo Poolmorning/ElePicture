@@ -49,15 +49,6 @@ public class ImageManager extends Application {
         ScrollPane imageScrollPane = new ScrollPane(imagePreviewPane);
         imageScrollPane.setFitToWidth(true);
 
-        //将缩略图区域包装到滚动面板中
-        directoryTree.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {//当用户选择新节点时触发
-                File dir = newVal.getValue();//获取选中节点对应的目录文件对象
-                //currentDirectory = dir;
-                thumbnailManager.generateThumbnails(dir, imagePreviewPane, statusLabel,fileOperator);
-            }
-        });
-
         //初始化幻灯片播放按钮
         Image play = new Image(getClass().getResourceAsStream("/image/24gf-playCircle-copy.png"));//不知道为什么相对路径用不了？
         ImageView playIcon = new ImageView(play);
@@ -87,6 +78,17 @@ public class ImageManager extends Application {
                 }
             }
         });
+
+        //将缩略图区域包装到滚动面板中
+        directoryTree.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {//当用户选择新节点时触发
+                File dir = newVal.getValue();//获取选中节点对应的目录文件对象
+                //currentDirectory = dir;
+                thumbnailManager.generateThumbnails(dir, imagePreviewPane, statusLabel,fileOperator);
+            }
+        });
+
+
 
         // 布局组装
         HBox bottomPanel = new HBox(10, slideShowButton, statusLabel);

@@ -82,7 +82,7 @@ public class ThumbnailManager {
                         box.setStyle("-fx-border-color: transparent;");
 
                         // 双击事件处理
-                        setupDoubleClickHandler(box, dir);
+                        //setupDoubleClickHandler(box, dir);
 
                         // 初始化鼠标拖动控制器
                         //MouseDraggedController mouseDraggedController = new MouseDraggedController(container, allThumbnails, selectedBoxes);
@@ -94,6 +94,22 @@ public class ThumbnailManager {
                             if (event.getButton() == MouseButton.PRIMARY) {//如果是左键点击
                                 if (contextMenu != null) {
                                     contextMenu.hide();
+                                }
+                                if (event.getClickCount() == 2) {//如果是双击事件
+                                    // 获取当前目录下的所有图片文件
+                                    List<File> imageFiles = getCurrentDirectoryImages(dir);
+
+                                    // 确保目录中有图片文件
+                                    if (!imageFiles.isEmpty()) {
+                                        //获取当前点击的缩略图对应的文件在列表中的索引位置
+                                        int index = imageFiles.indexOf(boxFileMap.get(box));
+
+                                        // 确保找到了对应的文件索引
+                                        if (index >= 0) {
+                                            SlideShowWindow slideShow = new SlideShowWindow(imageFiles, index);
+                                            slideShow.show();
+                                        }
+                                    }
                                 }
 
                                 if (event.isControlDown()) {//如果按下Ctrl键
@@ -116,6 +132,27 @@ public class ThumbnailManager {
 
                             }
                         });
+                        //添加键盘事件处理
+                        box.setOnKeyPressed(event -> {
+                            if (event.isControlDown()) {
+                                switch (event.getCode()) {
+                                    case C:
+                                        fileOperator.copy(selectedBoxes, boxFileMap);
+                                        statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
+                                        event.consume();
+                                        break;
+                                    case V:
+                                        fileOperator.paste(dir);
+                                        statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
+                                        generateThumbnails(dir, thisPane, statusLabel, fileOperator);
+                                        event.consume();
+                                        break;
+                                }
+                            }
+                        });
+
+                        // 确保面板可以接收键盘事件
+                        imagePreviewPane.setFocusTraversable(true);
 
                         //添加图片框到预览面板
                         imagePreviewPane.getChildren().add(box);
@@ -283,12 +320,7 @@ public class ThumbnailManager {
         return imageFiles;
     }
 
-    /**
-     * 设置缩略图的双击事件处理器，用于进入幻灯片播放模式
-     *
-     * @param box         缩略图的VBox容器
-     * @param dir         当前目录文件对象
-     */
+    //双击事件
     private void setupDoubleClickHandler(VBox box, File dir) {
         // 为缩略图容器设置鼠标点击事件监听器
         box.setOnMouseClicked(event -> {
@@ -300,14 +332,11 @@ public class ThumbnailManager {
                 // 确保目录中有图片文件
                 if (!imageFiles.isEmpty()) {
                     // 获取当前点击的缩略图对应的文件在列表中的索引位置
-                    // boxFileMap保存了VBox到File的映射关系
                     int index = imageFiles.indexOf(boxFileMap.get(box));
 
                     // 确保找到了对应的文件索引
                     if (index >= 0) {
                         // 创建并显示幻灯片播放窗口
-                        // 参数1: 所有图片文件的列表
-                        // 参数2: 当前点击图片的索引位置
                         SlideShowWindow slideShow = new SlideShowWindow(imageFiles, index);
                         slideShow.show();
                     }
