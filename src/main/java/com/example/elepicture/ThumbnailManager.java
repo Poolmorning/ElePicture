@@ -132,24 +132,7 @@ public class ThumbnailManager {
 
                             }
                         });
-                        //添加键盘事件处理
-                        box.setOnKeyPressed(event -> {
-                            if (event.isControlDown()) {
-                                switch (event.getCode()) {
-                                    case C:
-                                        fileOperator.copy(selectedBoxes, boxFileMap);
-                                        statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
-                                        event.consume();
-                                        break;
-                                    case V:
-                                        fileOperator.paste(dir);
-                                        statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
-                                        generateThumbnails(dir, thisPane, statusLabel, fileOperator);
-                                        event.consume();
-                                        break;
-                                }
-                            }
-                        });
+
 
                         // 确保面板可以接收键盘事件
                         imagePreviewPane.setFocusTraversable(true);
