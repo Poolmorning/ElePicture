@@ -88,6 +88,7 @@ public class FileOperator {
         for (File source : filesToPaste) {
             try {
                 Path destPath = destination.toPath().resolve(source.getName());//目标路径
+                System.out.println(destPath);
                 File destFile = handleNameConflict(destPath.toFile());// 处理文件名冲突
                 // 根据操作类型执行复制或剪切
                 if (clipboardManager.getOperationType() == ClipboardManager.OperationType.COPY) {
