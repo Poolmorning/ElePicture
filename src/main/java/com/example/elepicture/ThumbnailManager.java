@@ -26,6 +26,10 @@ public class ThumbnailManager {
     private final Set<VBox> allThumbnails = new HashSet<>(); //保存所有缩略图
     private FlowPane thisPane; // 当前的FlowPane
 
+    public Set<VBox> getAllThumbnails() {
+        return allThumbnails;
+    }
+
     public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel, FileOperator fileOperator) {
         if (dir != null) {//如果所选不为空
             thisPane = imagePreviewPane; // 保存当前的FlowPane
@@ -146,12 +150,12 @@ public class ThumbnailManager {
                                         event.consume();
                                         break;
 
-//                                    case V: // Ctrl + V
-//                                        fileOperator.paste(dir);
-//                                        statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
-//                                        // 刷新显示
-//                                        generateThumbnails(dir, thisPane, statusLabel, fileOperator);
-//                                        break;
+                                      case V: // Ctrl + V
+                                          fileOperator.paste(dir);
+                                          statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
+                                          // 刷新显示
+                                          generateThumbnails(dir, thisPane, statusLabel, fileOperator);
+                                          break;
                                     case D: // Ctrl + D
                                         try {
                                             fileOperator.delete(selectedBoxes, boxFileMap);

@@ -2,6 +2,8 @@ package com.example.elepicture;
 
 import com.example.elepicture.utils.ClipboardManager;
 import com.example.elepicture.utils.FileOperator;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -13,6 +15,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
+
+import javafx.animation.PauseTransition;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
+
+
 import java.io.*;
 import java.util.List;
 
@@ -77,6 +91,27 @@ public class ImageManager extends Application {
                 if (!imageFiles.isEmpty()) {
                     SlideShowWindow slideShow = new SlideShowWindow(imageFiles, 0);
                     slideShow.show();
+                }else{
+                    // 创建一个新窗口（Stage）
+                    Stage popupStage = new Stage();
+                    popupStage.initModality(Modality.APPLICATION_MODAL); // 模态窗口
+                    popupStage.initStyle(StageStyle.UNDECORATED); // 无边框
+
+                    // 创建消息内容
+                    Label messageLabel = new Label(" 该目录没有图片！");
+                    messageLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.7); -fx-padding: 10px;");
+                    StackPane pane = new StackPane(messageLabel);
+
+                    // 设置场景
+                    Scene popupScene = new Scene(pane);
+                    popupStage.setScene(popupScene);
+                    popupStage.setAlwaysOnTop(true);
+                    popupStage.show();
+
+                    // 设置 1.5 秒后关闭窗口的定时器
+                    PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
+                    delay.setOnFinished(event -> popupStage.close());
+                    delay.play();
                 }
             }
         });
@@ -89,8 +124,6 @@ public class ImageManager extends Application {
                 thumbnailManager.generateThumbnails(dir, imagePreviewPane, statusLabel,fileOperator);
             }
         });
-
-
 
         // 布局组装
         HBox bottomPanel = new HBox(10, slideShowButton, statusLabel);
@@ -136,6 +169,15 @@ public class ImageManager extends Application {
         primaryStage.show();
 
     }
+
+
+
+
+
+
+
+
+
 
     /**
      * 启动JavaFX应用

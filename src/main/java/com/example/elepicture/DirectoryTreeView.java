@@ -15,6 +15,7 @@ public class DirectoryTreeView extends TreeView<File> {
         setPrefWidth(250);//设置宽度
         initTree();//初始化树
     }
+
     //获取电脑所有磁盘根目录
     private void initTree() {
         //创建根节点"此电脑"
@@ -31,6 +32,7 @@ public class DirectoryTreeView extends TreeView<File> {
         setRoot(rootItem);//设置根节点为"此电脑"
         setShowRoot(true);//显示根节点
     }
+
     //创建磁盘节点
     private TreeItem<File> createDirectoryItem(File directory) {
         TreeItem<File> item = new TreeItem<>(directory);

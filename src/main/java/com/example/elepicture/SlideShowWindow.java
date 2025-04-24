@@ -45,8 +45,8 @@ public class SlideShowWindow {
         imagePane.setPadding(new Insets(10));
 
         //创建控制按钮
-        Button prevButton = new Button("左");//前一张图片
-        Button nextButton = new Button("右");//下一张图片
+        Button prevButton = new Button("<-");//前一张图片
+        Button nextButton = new Button("->");//下一张图片
         Button zoomInButton = new Button("放大");
         Button zoomOutButton = new Button("缩小");
         Button playButton = new Button("播放");
@@ -169,6 +169,10 @@ public class SlideShowWindow {
         if (currentZoomLevel < zoomLevels.length - 1) {
             currentZoomLevel++;//增加缩放级别
             adjustImageSize();
+            //double imageWidth = imageView.getImage().getWidth();
+          // double imageHeight = imageView.getImage().getHeight();
+          //  imageView.setFitWidth(imageWidth * zoomLevels[currentZoomLevel]);
+          //  imageView.setFitHeight(imageHeight * zoomLevels[currentZoomLevel]);
         }
     }
 
