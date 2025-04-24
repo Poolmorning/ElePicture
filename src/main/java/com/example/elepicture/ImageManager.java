@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.*;
@@ -133,6 +134,7 @@ public class ImageManager extends Application {
         primaryStage.setTitle("电子图片管理程序");
         primaryStage.setScene(scene);
         primaryStage.show();
+
     }
 
     /**

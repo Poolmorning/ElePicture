@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -89,8 +90,11 @@ public class ThumbnailManager {
                         boxFileMap.put(box, file);
                         allThumbnails.add(box); // 添加到所有缩略图集合
 
+                        box.setFocusTraversable(true); // 允许 box 获取焦点
+
                         //设置鼠标点击事件
                         box.setOnMouseClicked(event -> {
+                            box.requestFocus(); //  鼠标点击时强制获取焦点
                             if (event.getButton() == MouseButton.PRIMARY) {//如果是左键点击
                                 if (contextMenu != null) {
                                     contextMenu.hide();
@@ -132,11 +136,45 @@ public class ThumbnailManager {
 
                             }
                         });
+                        // 键盘监听逻辑（在 box 上监听）
+                        box.setOnKeyPressed(event -> {
+                            if (event.isControlDown()) {
+                                switch (event.getCode()){
+                                    case C:
+                                        fileOperator.copy(selectedBoxes, boxFileMap);
+                                        statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
+                                        event.consume();
+                                        break;
 
+//                                    case V: // Ctrl + V
+//                                        fileOperator.paste(dir);
+//                                        statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
+//                                        // 刷新显示
+//                                        generateThumbnails(dir, thisPane, statusLabel, fileOperator);
+//                                        break;
+                                    case D: // Ctrl + D
+                                        try {
+                                            fileOperator.delete(selectedBoxes, boxFileMap);
+                                        } catch (IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                        // 刷新显示
+                                        generateThumbnails(dir, thisPane, statusLabel, fileOperator);
+                                        break;
+                                    case X:
+                                        fileOperator.cut(selectedBoxes, boxFileMap);
+                                        statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
+                                        generateThumbnails(dir, thisPane, statusLabel, fileOperator);
+
+                                }
+
+
+
+                            }
+                        });
 
                         // 确保面板可以接收键盘事件
                         imagePreviewPane.setFocusTraversable(true);
-
                         //添加图片框到预览面板
                         imagePreviewPane.getChildren().add(box);
                         count++;//增加计数器
