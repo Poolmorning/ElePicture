@@ -133,8 +133,6 @@ public class ImageManager extends Application {
         primaryStage.setTitle("电子图片管理程序");
         primaryStage.setScene(scene);
         primaryStage.show();
-
-
     }
 
     /**
