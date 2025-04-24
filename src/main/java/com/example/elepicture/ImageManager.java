@@ -4,6 +4,7 @@ import com.example.elepicture.utils.ClipboardManager;
 import com.example.elepicture.utils.FileOperator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -13,7 +14,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.*;
 import java.util.List;
-////
 
  //电子图片管理程序的主类
 public class ImageManager extends Application {
@@ -30,7 +30,7 @@ public class ImageManager extends Application {
     public void start(Stage primaryStage) {
         // 初始化目录树
         DirectoryTreeView directoryTree = new DirectoryTreeView();
-        directoryTree.setPrefWidth(200); // 设置目录树宽度
+        directoryTree.setPrefWidth(250); // 设置目录树宽度
 
         // 初始化缩略图管理器
         FlowPane imagePreviewPane = new FlowPane();
@@ -50,7 +50,8 @@ public class ImageManager extends Application {
         imageScrollPane.setFitToWidth(true);
 
         //初始化幻灯片播放按钮
-        Image play = new Image(getClass().getResourceAsStream("/image/24gf-playCircle-copy.png"));//不知道为什么相对路径用不了？
+        Image play = new Image(getClass().getResourceAsStream("/image/24gf-playCircle-copy.png"));
+        //Image play = new Image("/image/24gf-playCircle-copy.png");//不知道为什么相对路径用不了？
         ImageView playIcon = new ImageView(play);
         playIcon.setFitWidth(15);
         playIcon.setFitHeight(15);
@@ -100,13 +101,30 @@ public class ImageManager extends Application {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS); // 关键：让间隔区域自动扩展
 
-        VBox leftPane = new VBox(directoryTree);
-        VBox.setVgrow(directoryTree, Priority.ALWAYS);// 目录树填充左侧剩余空间
-
-        HBox bf =new HBox(statusLabel,spacer,bottomPanel);
         BorderPane mainLayout = new BorderPane();
+        HBox bf =new HBox(statusLabel,spacer,bottomPanel);
+
+        VBox leftPane = new VBox(directoryTree);
+
+        VBox.setVgrow(directoryTree, Priority.ALWAYS);// 目录树填充左侧剩余空间
+        leftPane.setMinWidth(150);   // 最小宽度
+        leftPane.setPrefWidth(250);  // 默认显示宽度
+
+        // 中间图片预览面板（已包装为 ScrollPane）
+        ScrollPane centerPane = imageScrollPane;
+
+        // 使用 SplitPane 实现左右拖动
+        SplitPane splitPane = new SplitPane();
+        splitPane.setOrientation(Orientation.HORIZONTAL); // 横向分割
+        splitPane.getItems().addAll(leftPane, centerPane);
+        splitPane.setDividerPositions(0.25); // 左侧占25%宽度
+        SplitPane.setResizableWithParent(leftPane, false);
+
+        // 放入 BorderPane 中
+        mainLayout.setCenter(splitPane); // 使用 splitPane 作为中间部分
+
         mainLayout.setLeft(leftPane);
-        mainLayout.setCenter(imageScrollPane);
+        //mainLayout.setCenter(imageScrollPane);
         mainLayout.setBottom(bf);
         //mainLayout.setBottom();
 
@@ -115,8 +133,6 @@ public class ImageManager extends Application {
         primaryStage.setTitle("电子图片管理程序");
         primaryStage.setScene(scene);
         primaryStage.show();
-
-
     }
 
     /**

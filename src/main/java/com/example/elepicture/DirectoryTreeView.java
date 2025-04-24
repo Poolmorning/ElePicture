@@ -9,9 +9,10 @@ import java.util.stream.Collectors;
 
 public class DirectoryTreeView extends TreeView<File> {
 
+    // 构造方法
     public DirectoryTreeView() {
         super();
-        setPrefWidth(200);//设置宽度
+        setPrefWidth(250);//设置宽度
         initTree();//初始化树
     }
     //获取电脑所有磁盘根目录
