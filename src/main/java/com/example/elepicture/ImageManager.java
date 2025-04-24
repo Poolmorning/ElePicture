@@ -77,6 +77,27 @@ public class ImageManager extends Application {
                 if (!imageFiles.isEmpty()) {
                     SlideShowWindow slideShow = new SlideShowWindow(imageFiles, 0);
                     slideShow.show();
+                }else{
+                    // 创建一个新窗口（Stage）
+                    Stage popupStage = new Stage();
+                    popupStage.initModality(Modality.APPLICATION_MODAL); // 模态窗口
+                    popupStage.initStyle(StageStyle.UNDECORATED); // 无边框
+
+                    // 创建消息内容
+                    Label messageLabel = new Label(" 该目录没有图片！");
+                    messageLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.7); -fx-padding: 10px;");
+                    StackPane pane = new StackPane(messageLabel);
+
+                    // 设置场景
+                    Scene popupScene = new Scene(pane);
+                    popupStage.setScene(popupScene);
+                    popupStage.setAlwaysOnTop(true);
+                    popupStage.show();
+
+                    // 设置 1.5 秒后关闭窗口的定时器
+                    PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
+                    delay.setOnFinished(event -> popupStage.close());
+                    delay.play();
                 }
             }
         });
