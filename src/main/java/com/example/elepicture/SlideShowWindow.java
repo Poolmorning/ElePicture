@@ -1,6 +1,7 @@
 package com.example.elepicture;
 
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,7 +13,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -26,7 +29,7 @@ public class SlideShowWindow {
     private int currentIndex;//图片的索引
     private ImageView imageView;//图片视图
     private Timeline timeline;//幻灯片自动播放的时间轴控制器
-    private final double[] zoomLevels = {0.5, 0.75, 1.0, 1.25, 1.5, 2.0};//50%, 75%, 100%, 125%, 150%, 200% 缩放
+    private final double[] zoomLevels = {0.1,0.5, 0.75, 1.0, 1.25, 1.5, 2.0};//50%, 75%, 100%, 125%, 150%, 200% 缩放
     private int currentZoomLevel = 0; // 默认1.0倍
     private Scene scene;
 
@@ -273,26 +276,25 @@ public class SlideShowWindow {
     }
 
     private void showAlert(String message) {
-        // 创建提示标签
-        Label alertLabel = new Label(message);
-        alertLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.7); -fx-padding: 10px;");
-        alertLabel.setAlignment(Pos.CENTER);
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL); // 模态窗口
+        popupStage.initStyle(StageStyle.UNDECORATED); // 无边框
 
-        // 获取ScrollPane
-        ScrollPane scrollPane = (ScrollPane) ((BorderPane) scene.getRoot()).getCenter();
-        // 获取ScrollPane中的StackPane
-        StackPane imagePane = (StackPane) scrollPane.getContent();
+        // 创建消息内容
+        Label messageLabel = new Label(message);
+        messageLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.7); -fx-padding: 10px;");
+        StackPane pane = new StackPane(messageLabel);
 
-        imagePane.getChildren().add(alertLabel);
-        StackPane.setAlignment(alertLabel, Pos.CENTER);
+        // 设置场景
+        Scene popupScene = new Scene(pane);
+        popupStage.setScene(popupScene);
+        popupStage.setAlwaysOnTop(true);
+        popupStage.show();
 
-        // 创建1秒后消失的动画
-        Timeline fadeTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(1), e -> {
-                    imagePane.getChildren().remove(alertLabel);
-                })
-        );
-        fadeTimeline.play();
+        // 设置 1.5 秒后关闭窗口的定时器
+        PauseTransition delay = new PauseTransition(Duration.seconds(1));
+        delay.setOnFinished(event -> popupStage.close());
+        delay.play();
     }
 
     public void show() {
