@@ -18,6 +18,8 @@ import javafx.util.Duration;
 import java.io.File;
 import java.util.List;
 
+import javafx.scene.control.ScrollPane;
+
 public class SlideShowWindow {
     private final Stage stage;
     private final List<File> imageFiles;//要展示的图片文件列表
@@ -25,8 +27,10 @@ public class SlideShowWindow {
     private ImageView imageView;//图片视图
     private Timeline timeline;//幻灯片自动播放的时间轴控制器
     private final double[] zoomLevels = {0.5, 0.75, 1.0, 1.25, 1.5, 2.0};//50%, 75%, 100%, 125%, 150%, 200% 缩放
-    private int currentZoomLevel = 2; // 默认1.0倍
+    private int currentZoomLevel = 0; // 默认1.0倍
     private Scene scene;
+
+    private Label statusLabel;
 
     public SlideShowWindow(List<File> imageFiles, int startIndex) {
         this.imageFiles = imageFiles;//存储图片文件列表
@@ -41,8 +45,28 @@ public class SlideShowWindow {
         imageView.setSmooth(true);//启用图片平滑处理
 
         //创建图片容器面板
+        /*
         StackPane imagePane = new StackPane(imageView);
         imagePane.setPadding(new Insets(10));
+        */
+
+        StackPane imageContainer = new StackPane(imageView);
+        imageContainer.setPadding(new Insets(10));
+
+        // 使用 ScrollPane 包裹 StackPane
+        ScrollPane scrollPane = new ScrollPane(imageContainer);
+        scrollPane.setPannable(true); // 鼠标可拖动
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setPadding(new Insets(10));
+
+        /*
+        ScrollPane scrollPane = new ScrollPane(imageView);
+        scrollPane.setPannable(true); // 启用鼠标拖动
+        scrollPane.setFitToWidth(true); // 图片宽度适应窗口宽度（适度）
+        scrollPane.setFitToHeight(true); // 图片高度适应窗口高度
+        scrollPane.setPadding(new Insets(10));
+        */
 
         //创建控制按钮
         Button prevButton = new Button("<-");//前一张图片
@@ -73,8 +97,10 @@ public class SlideShowWindow {
         exitButton.setOnAction(e -> stage.close());//点击关闭窗口
 
         //状态标签
-        Label statusLabel = new Label();
+        //Label statusLabel = new Label();
+        statusLabel = new Label();
         statusLabel.setStyle("-fx-font-size: 14px;");
+        //statusLabel.setStyle("-fx-font-size: 14px;");
 
         //控制面板
         HBox controlPanel = new HBox(10, prevButton, nextButton, zoomInButton, zoomOutButton, playButton, stopButton, exitButton, statusLabel);
@@ -84,7 +110,12 @@ public class SlideShowWindow {
 
         //主布局
         BorderPane root = new BorderPane();
+
+        /*
         root.setCenter(imagePane);
+         */
+        root.setCenter(scrollPane);
+
         root.setBottom(controlPanel);
 
         scene = new Scene(root, 800, 600);
@@ -111,9 +142,13 @@ public class SlideShowWindow {
 
         // 更新窗口标题显示当前图片位置
         stage.setTitle("幻灯片播放 (" + (currentIndex + 1) + "/" + imageFiles.size() + ")");
+
+        //状态同步
+        updateZoomStatus();
     }
     //调整图片显示大小以适应窗口
     private void adjustImageSize() {
+       /*
         if (imageView.getImage() == null) return;
         //图片可用的最大宽度和高度
         double maxWidth = scene.getWidth() - 40;
@@ -140,6 +175,33 @@ public class SlideShowWindow {
             imageView.setFitWidth(imageWidth);
             imageView.setFitHeight(imageHeight);
         }
+        */
+
+
+
+
+
+
+        if (imageView.getImage() == null) return;
+
+        // 原始图片大小
+        double originalWidth = imageView.getImage().getWidth();
+        double originalHeight = imageView.getImage().getHeight();
+
+        // 当前缩放因子
+        double zoomFactor = zoomLevels[currentZoomLevel];
+
+        // 计算缩放后的尺寸
+        double newWidth = originalWidth * zoomFactor;
+        double newHeight = originalHeight * zoomFactor;
+
+        // 应用缩放后的尺寸
+        imageView.setFitWidth(newWidth);
+        imageView.setFitHeight(newHeight);
+
+
+
+
     }
     //显示上一张图片
     private void showPreviousImage() {
@@ -166,21 +228,40 @@ public class SlideShowWindow {
     }
     //放大图片
     private void zoomIn() {
+        /*
         if (currentZoomLevel < zoomLevels.length - 1) {
             currentZoomLevel++;//增加缩放级别
             adjustImageSize();
-            //double imageWidth = imageView.getImage().getWidth();
-          // double imageHeight = imageView.getImage().getHeight();
-          //  imageView.setFitWidth(imageWidth * zoomLevels[currentZoomLevel]);
-          //  imageView.setFitHeight(imageHeight * zoomLevels[currentZoomLevel]);
+        }
+        */
+        if (currentZoomLevel < zoomLevels.length - 1) {
+            currentZoomLevel++;
+            adjustImageSize();
+            updateZoomStatus();
+        } else {
+            showAlert("已达到最大缩放级别");
         }
     }
 
     private void zoomOut() {
+        /*
         if (currentZoomLevel > 0) {
             currentZoomLevel--;//减小缩放级别
             adjustImageSize();
         }
+        */
+        if (currentZoomLevel > 0) {
+            currentZoomLevel--;
+            adjustImageSize();
+            updateZoomStatus();
+        } else {
+            showAlert("已达到最小缩放级别");
+        }
+    }
+
+    private void updateZoomStatus() {
+        int percent = (int) (zoomLevels[currentZoomLevel] * 100);
+        statusLabel.setText("缩放: " + percent + "%");
     }
 
     private void startSlideShow() {
@@ -197,8 +278,11 @@ public class SlideShowWindow {
         alertLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.7); -fx-padding: 10px;");
         alertLabel.setAlignment(Pos.CENTER);
 
-        // 将标签添加到StackPane中（确保它在图片上方）
-        StackPane imagePane = (StackPane) ((BorderPane) scene.getRoot()).getCenter();
+        // 获取ScrollPane
+        ScrollPane scrollPane = (ScrollPane) ((BorderPane) scene.getRoot()).getCenter();
+        // 获取ScrollPane中的StackPane
+        StackPane imagePane = (StackPane) scrollPane.getContent();
+
         imagePane.getChildren().add(alertLabel);
         StackPane.setAlignment(alertLabel, Pos.CENTER);
 
