@@ -1,6 +1,7 @@
 package com.example.elepicture;
 
 import com.example.elepicture.utils.FileOperator;
+import com.example.elepicture.utils.SelectionBox;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -31,12 +32,17 @@ public class ThumbnailManager {
     private FlowPane thisPane;
     private ThumbnailLoaderService thumbnailLoaderService;
     private FlowPane imagePane;
+    private SelectionBox selectionBox;
+    private boolean isDraggingSelectionBox = false;
+    private File cur;
 
     public Set<VBox> getAllThumbnails() {
         return allThumbnails;
     }
 
     public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel, FileOperator fileOperator) {
+        //System.out.println("Current directory before paste: " + dir.getAbsolutePath());
+        cur = dir;
         this.imagePane = imagePreviewPane; // 存储引用
         this.thisPane = imagePreviewPane; // 同时更新 thisPane（如果其他地方用到）
         // 取消正在进行的加载任务
@@ -67,6 +73,7 @@ public class ThumbnailManager {
 
         // 启动服务
         thumbnailLoaderService.restart();
+        //System.out.println("Current directory before paste: " + dir.getAbsolutePath());
     }
 
     private class ThumbnailLoaderService extends Service<Void> {
@@ -102,6 +109,8 @@ public class ThumbnailManager {
                                 count = 0;
                                 totalSize = 0;
 
+                                // 框选
+                                selectionBox = new SelectionBox(imagePreviewPane, allThumbnails, selectedBoxes, statusLabel);
                                 // 设置空白处点击事件
                                 imagePreviewPane.setOnMouseClicked(event -> {
                                     if (event.getButton() == MouseButton.PRIMARY && event.getTarget() == imagePreviewPane) {
@@ -243,7 +252,7 @@ public class ThumbnailManager {
             contextMenu.hide();
         }
 
-        File currentFile = boxFileMap.get(box);
+        //File currentFile = boxFileMap.get(box);
 
         MenuItem copyItem = new MenuItem("复制");
         MenuItem cutItem = new MenuItem("剪切");
@@ -252,34 +261,39 @@ public class ThumbnailManager {
         MenuItem renameItem = new MenuItem("重命名");
 
         copyItem.setOnAction(event -> {
-            fileOperator.copy(selectedBoxes, boxFileMap);
+            fileOperator.copy(getSelectedBoxes(), getBoxFileMap());
             statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
+
+            //generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
+            //System.out.println("Current directory before paste: " + currentDir.getAbsolutePath());
         });
 
         cutItem.setOnAction(event -> {
-            fileOperator.cut(selectedBoxes, boxFileMap);
+            fileOperator.cut(getSelectedBoxes(), getBoxFileMap());
             statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
-            generateThumbnails(currentDir, thisPane, statusLabel, fileOperator);
+            generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
 
         pasteItem.setOnAction(event -> {
-            fileOperator.paste(currentDir);
+            //System.out.println("Current directory before paste: " + cur.getAbsolutePath());
+            fileOperator.paste(cur);
             statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
-            generateThumbnails(currentDir, thisPane, statusLabel, fileOperator);
+            //System.out.println("Current directory after paste: " + currentDir.getAbsolutePath()
+            generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
 
         deleteItem.setOnAction(event -> {
             try {
-                fileOperator.delete(selectedBoxes, boxFileMap);
+                fileOperator.delete(getSelectedBoxes(), getBoxFileMap());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            generateThumbnails(currentDir, thisPane, statusLabel, fileOperator);
+            generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
 
         renameItem.setOnAction(event -> {
-            fileOperator.rename(selectedBoxes, boxFileMap);
-            generateThumbnails(currentDir, thisPane, statusLabel, fileOperator);
+            fileOperator.rename(getSelectedBoxes(), getBoxFileMap());
+            generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
 
         if (contextMenu == null) {
@@ -291,6 +305,7 @@ public class ThumbnailManager {
         if (box == null) {
             contextMenu.show(imagePreviewPane, x, y);
         }
+
     }
 
     private List<File> getSelectedFiles() {
@@ -352,5 +367,14 @@ public class ThumbnailManager {
             }
         }
         return imageFiles;
+    }
+    // 获取当前选中的图片框集合
+    public Set<VBox> getSelectedBoxes() {
+        return selectedBoxes;
+    }
+
+    // 获取图片框到文件的映射
+    public HashMap<VBox, File> getBoxFileMap() {
+        return boxFileMap;
     }
 }
