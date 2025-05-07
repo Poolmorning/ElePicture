@@ -2,8 +2,7 @@ package com.example.elepicture;
 
 import com.example.elepicture.utils.ClipboardManager;
 import com.example.elepicture.utils.FileOperator;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -12,21 +11,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-
-
-import javafx.animation.PauseTransition;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-
+import javafx.util.Duration;
 import java.io.*;
 import java.util.List;
 
@@ -125,6 +114,8 @@ public class ImageManager extends Application {
             }
         });
 
+
+
         // 布局组装
         HBox bottomPanel = new HBox(10, slideShowButton, statusLabel);
         bottomPanel.setAlignment(Pos.CENTER_LEFT);
@@ -169,15 +160,6 @@ public class ImageManager extends Application {
         primaryStage.show();
 
     }
-
-
-
-
-
-
-
-
-
 
     /**
      * 启动JavaFX应用
