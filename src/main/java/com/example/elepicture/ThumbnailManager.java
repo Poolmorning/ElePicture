@@ -31,12 +31,15 @@ public class ThumbnailManager {
     private final Set<VBox> allThumbnails = new HashSet<>();
     private FlowPane thisPane;
     private ThumbnailLoaderService thumbnailLoaderService;
+    private FlowPane imagePane;
 
     public Set<VBox> getAllThumbnails() {
         return allThumbnails;
     }
 
     public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel, FileOperator fileOperator) {
+        this.imagePane = imagePreviewPane; // 存储引用
+        this.thisPane = imagePreviewPane; // 同时更新 thisPane（如果其他地方用到）
         // 取消正在进行的加载任务
         if (thumbnailLoaderService != null) {
             thumbnailLoaderService.cancel();
@@ -142,6 +145,7 @@ public class ThumbnailManager {
     }
 
     private void createThumbnail(File file, FlowPane imagePreviewPane, File dir, Label statusLabel, FileOperator fileOperator) {
+
         Image img = new Image(file.toURI().toString(), 100, 100, true, true, true);
         ImageView imageView = new ImageView(img);
         imageView.setFitHeight(100);
@@ -229,8 +233,8 @@ public class ThumbnailManager {
                 }
             }
         });
-
-        imagePreviewPane.getChildren().add(box);
+        this.imagePane.getChildren().add(box);
+        //imagePreviewPane.getChildren().add(box);
         count++;
         totalSize += file.length();
     }
