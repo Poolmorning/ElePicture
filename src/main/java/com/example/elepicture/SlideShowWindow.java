@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.List;
 
 import javafx.scene.control.ScrollPane;
+import javafx.application.Platform;
 
 public class SlideShowWindow {
     private final Stage stage;
@@ -182,9 +183,34 @@ public class SlideShowWindow {
 
 
 
+        if (imageView.getImage() == null) return;
+
+        // 原始图片尺寸
+        double originalWidth = imageView.getImage().getWidth();
+        double originalHeight = imageView.getImage().getHeight();
+
+        // 应用当前缩放级别
+        double zoomFactor = zoomLevels[currentZoomLevel];
+        imageView.setFitWidth(originalWidth * zoomFactor);
+        imageView.setFitHeight(originalHeight * zoomFactor);
+
+        // 获取ScrollPane视口和内容尺寸
+        ScrollPane scrollPane = (ScrollPane) scene.lookup(".scroll-pane");
+        double viewportWidth = scrollPane.getViewportBounds().getWidth();
+        double viewportHeight = scrollPane.getViewportBounds().getHeight();
+
+        // 计算居中滚动位置
+        double hScroll = (imageView.getFitWidth() - viewportWidth) / 2;
+        double vScroll = (imageView.getFitHeight() - viewportHeight) / 2;
+
+        // 设置视口位置（需放在Platform.runLater中确保UI更新完成）
+        Platform.runLater(() -> {
+            scrollPane.setHvalue(hScroll / (imageView.getFitWidth() - viewportWidth));
+            scrollPane.setVvalue(vScroll / (imageView.getFitHeight() - viewportHeight));
+        });
 
 
-
+        /*
         if (imageView.getImage() == null) return;
 
         // 原始图片大小
@@ -202,7 +228,7 @@ public class SlideShowWindow {
         imageView.setFitWidth(newWidth);
         imageView.setFitHeight(newHeight);
 
-
+        */
 
 
     }
