@@ -19,17 +19,13 @@ import java.util.List;
 
 //电子图片管理程序的主类
 public class ImageManager extends Application {
-    // 缩略图管理器，负责生成和显示图片缩略图
     private ThumbnailManager thumbnailManager;
-    // 状态栏标签，用于显示当前操作状态（如目录加载进度）
     private Label statusLabel;
-    // 剪贴板管理器，处理文件的复制/粘贴操作
-    ClipboardManager clipboardManager = new ClipboardManager();
-    // 文件操作器，封装文件的删除、重命名等操作
-    FileOperator fileOperator = new FileOperator(clipboardManager);
     private TextField addressBar;
     private File currentDir;
     private FlowPane imagePreviewPane;
+    ClipboardManager clipboardManager = new ClipboardManager();
+    FileOperator fileOperator = new FileOperator(clipboardManager);
 
     @Override
     public void start(Stage primaryStage) {
@@ -64,7 +60,7 @@ public class ImageManager extends Application {
         Button cutButton = new Button();
         Button deleteButton = new Button();
         Button slideShowButton = new Button();
-        //Button reloadButton = createToolbarButton("刷新");
+
         // 设置按钮图标
         loadImage("/image/复制.png", copyButton);
         loadImage("/image/粘贴.png", pasteButton);
@@ -188,26 +184,6 @@ public class ImageManager extends Application {
         primaryStage.setTitle("电子图片管理程序");
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
-    private Button createToolbarButton(String text) {
-        Button button = new Button(text);
-        button.setStyle("-fx-background-color: #f0f0f0; " +
-                "-fx-border-color: #cccccc; " +
-                "-fx-border-radius: 3; " +
-                "-fx-padding: 5 10; " +
-                "-fx-min-width: 60px;");
-        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #e0e0e0; " +
-                "-fx-border-color: #cccccc; " +
-                "-fx-border-radius: 3; " +
-                "-fx-padding: 5 10; " +
-                "-fx-min-width: 60px;"));
-        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #f0f0f0; " +
-                "-fx-border-color: #cccccc; " +
-                "-fx-border-radius: 3; " +
-                "-fx-padding: 5 10; " +
-                "-fx-min-width: 60px;"));
-        return button;
     }
 
     private void chooseDirectory(Stage stage) {

@@ -2,7 +2,10 @@ package com.example.elepicture.utils;
 
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,6 +34,13 @@ public class FileOperator {
         // 确认对话框
         Alert confirmAlert = new Alert(AlertType.CONFIRMATION,
                 "确定要删除选中的 " + targets.size() + " 个文件吗？");
+        confirmAlert.setTitle("删除确认");
+        confirmAlert.setHeaderText("删除文件");
+        confirmAlert.setGraphic(null); // 去掉默认图标
+        //设置标题图标
+        Stage stage = (Stage) confirmAlert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/image/删除.png")));
+
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             return false; // 用户取消删除
@@ -59,7 +69,7 @@ public class FileOperator {
         return true;
     }
 
-    //剪切文
+    //剪切文件到剪贴板
     public boolean cut(Set<VBox> selectedBoxes, HashMap<VBox, File> boxFileMap) {
         //获取其中的文件
         List<File> sources = selectedBoxes.stream()
@@ -88,7 +98,7 @@ public class FileOperator {
         for (File source : filesToPaste) {
             try {
                 Path destPath = destination.toPath().resolve(source.getName());//目标路径
-                System.out.println(destPath);
+                //System.out.println(destPath);
                 File destFile = handleNameConflict(destPath.toFile());// 处理文件名冲突
                 // 根据操作类型执行复制或剪切
                 if (clipboardManager.getOperationType() == ClipboardManager.OperationType.COPY) {
@@ -123,11 +133,16 @@ public class FileOperator {
             String baseName = (dotIndex > 0) ? oldName.substring(0, dotIndex) : oldName;
             String extension = (dotIndex > 0) ? oldName.substring(dotIndex) : "";
 
-            //弹出⼀个对话框，让⽤户输⼊新的⽂件名，不要改变⽂件的后缀名
+            //弹出⼀个对话框，让⽤户输⼊新的⽂件名
             TextInputDialog dialog = new TextInputDialog(baseName);
             dialog.setTitle("重命名");
             dialog.setHeaderText("请输入新的文件名");
             dialog.setContentText("新的文件名：");
+            dialog.setGraphic(null); // 去掉默认图标
+            //设置标题图标
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/image/重命名.png")));
+
 
             Optional<String> result = dialog.showAndWait();
             if (result.isEmpty()) return success; // 用户取消
@@ -166,9 +181,13 @@ public class FileOperator {
             );
 
             Alert dialog = new Alert(AlertType.CONFIRMATION);
-            dialog.setTitle("批量重命名");
-            dialog.setHeaderText("请输入批量重命名参数");
+            dialog.setTitle("重命名");
+            dialog.setHeaderText("请输入新的文件名");
             dialog.getDialogPane().setContent(dialogContent);
+            dialog.setGraphic(null); // 去掉默认图标
+            //设置标题图标
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/image/重命名.png")));
 
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.isEmpty() || result.get() != ButtonType.OK) {
@@ -231,9 +250,8 @@ public class FileOperator {
             }
             return allSuccess;
         }
-
-
     }
+
     //错误提示
     private void showErrorAlert(String message) {
         Alert alert = new Alert(AlertType.ERROR);

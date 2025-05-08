@@ -41,7 +41,6 @@ public class ThumbnailManager {
     }
 
     public void generateThumbnails(File dir, FlowPane imagePreviewPane, Label statusLabel, FileOperator fileOperator) {
-        //System.out.println("Current directory before paste: " + dir.getAbsolutePath());
         cur = dir;
         this.imagePane = imagePreviewPane; // 存储引用
         this.thisPane = imagePreviewPane; // 同时更新 thisPane（如果其他地方用到）
@@ -73,7 +72,6 @@ public class ThumbnailManager {
 
         // 启动服务
         thumbnailLoaderService.restart();
-        //System.out.println("Current directory before paste: " + dir.getAbsolutePath());
     }
 
     private class ThumbnailLoaderService extends Service<Void> {
@@ -218,14 +216,11 @@ public class ThumbnailManager {
                 switch (event.getCode()) {
                     case C:
                         fileOperator.copy(selectedBoxes, boxFileMap);
-                        //statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
                         statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已复制 " + selectedBoxes.size() + " 个文件");
                         event.consume();
                         break;
                     case V:
                         fileOperator.paste(dir);
-                        //statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
-                        //statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已粘贴 " + selectedBoxes.size() + " 个文件");
                         generateThumbnails(dir, thisPane, statusLabel, fileOperator);
                         break;
                     case D:
@@ -238,9 +233,7 @@ public class ThumbnailManager {
                         break;
                     case X:
                         fileOperator.cut(selectedBoxes, boxFileMap);
-                        //statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
                         statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已剪切 " + selectedBoxes.size() + " 个文件");
-                        //generateThumbnails(dir, thisPane, statusLabel, fileOperator);
                 }
             }
         });
@@ -265,24 +258,16 @@ public class ThumbnailManager {
 
         copyItem.setOnAction(event -> {
             fileOperator.copy(getSelectedBoxes(), getBoxFileMap());
-            //statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
             statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已复制 " + selectedBoxes.size() + " 个文件");
-            //generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
-            //System.out.println("Current directory before paste: " + currentDir.getAbsolutePath());
         });
 
         cutItem.setOnAction(event -> {
             fileOperator.cut(getSelectedBoxes(), getBoxFileMap());
-            //statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
             statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已剪切 " + selectedBoxes.size() + " 个文件");
-            //generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
 
         pasteItem.setOnAction(event -> {
-            //System.out.println("Current directory before paste: " + cur.getAbsolutePath());
             fileOperator.paste(cur);
-            //statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
-            //System.out.println("Current directory after paste: " + currentDir.getAbsolutePath()
             generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
 

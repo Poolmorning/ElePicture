@@ -184,6 +184,8 @@ public class SlideShowWindow {
     }
 
     public void show() {
+        Image icon = new Image(getClass().getResourceAsStream("/image/图标.png"));
+        stage.getIcons().add(icon);
         stage.show();
     }
 
