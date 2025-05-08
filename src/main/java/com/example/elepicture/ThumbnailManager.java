@@ -203,7 +203,7 @@ public class ThumbnailManager {
                     clearSelection();
                     selectBox(box);
                 }
-                statusLabel.setText("已选中 " + selectedBoxes.size() + " 张图片");
+                statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已选中 " + selectedBoxes.size() + " 张图片");
             } else if (event.getButton() == MouseButton.SECONDARY) {
                 if (!selectedBoxes.contains(box)) {
                     clearSelection();
@@ -218,12 +218,14 @@ public class ThumbnailManager {
                 switch (event.getCode()) {
                     case C:
                         fileOperator.copy(selectedBoxes, boxFileMap);
-                        statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
+                        //statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
+                        statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已复制 " + selectedBoxes.size() + " 个文件");
                         event.consume();
                         break;
                     case V:
                         fileOperator.paste(dir);
-                        statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
+                        //statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
+                        //statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已粘贴 " + selectedBoxes.size() + " 个文件");
                         generateThumbnails(dir, thisPane, statusLabel, fileOperator);
                         break;
                     case D:
@@ -236,8 +238,9 @@ public class ThumbnailManager {
                         break;
                     case X:
                         fileOperator.cut(selectedBoxes, boxFileMap);
-                        statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
-                        generateThumbnails(dir, thisPane, statusLabel, fileOperator);
+                        //statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
+                        statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已剪切 " + selectedBoxes.size() + " 个文件");
+                        //generateThumbnails(dir, thisPane, statusLabel, fileOperator);
                 }
             }
         });
@@ -262,22 +265,23 @@ public class ThumbnailManager {
 
         copyItem.setOnAction(event -> {
             fileOperator.copy(getSelectedBoxes(), getBoxFileMap());
-            statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
-
+            //statusLabel.setText("已复制 " + selectedBoxes.size() + " 个文件");
+            statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已复制 " + selectedBoxes.size() + " 个文件");
             //generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
             //System.out.println("Current directory before paste: " + currentDir.getAbsolutePath());
         });
 
         cutItem.setOnAction(event -> {
             fileOperator.cut(getSelectedBoxes(), getBoxFileMap());
-            statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
-            generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
+            //statusLabel.setText("已剪切 " + selectedBoxes.size() + " 个文件");
+            statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已剪切 " + selectedBoxes.size() + " 个文件");
+            //generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
 
         pasteItem.setOnAction(event -> {
             //System.out.println("Current directory before paste: " + cur.getAbsolutePath());
             fileOperator.paste(cur);
-            statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
+            //statusLabel.setText("已粘贴 " + selectedBoxes.size() + " 个文件");
             //System.out.println("Current directory after paste: " + currentDir.getAbsolutePath()
             generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });

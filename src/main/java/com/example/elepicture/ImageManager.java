@@ -45,9 +45,8 @@ public class ImageManager extends Application {
         addressBar.setPrefWidth(600);
         addressBar.setOnAction(e -> navigateToDirectory(addressBar.getText()));
 
-        Button browseButton = new Button("浏览");
-        browseButton.setStyle(
-                "-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-radius: 3; -fx-padding: 5 10;");
+        Button browseButton = new Button();
+        loadImage("/image/打开.png", browseButton);
         browseButton.setOnAction(e -> chooseDirectory(primaryStage));
 
         addressBarBox.getChildren().addAll(addressBar, browseButton);
@@ -60,11 +59,18 @@ public class ImageManager extends Application {
         operationBar.setStyle("-fx-background-color: #f0f0f0;");
 
         // 创建操作按钮
-        Button copyButton = createToolbarButton("复制");
-        Button pasteButton = createToolbarButton("粘贴");
-        Button cutButton = createToolbarButton("剪切");
-        Button deleteButton = createToolbarButton("删除");
-        Button reloadButton = createToolbarButton("刷新");
+        Button copyButton = new Button();
+        Button pasteButton = new Button();
+        Button cutButton = new Button();
+        Button deleteButton = new Button();
+        Button slideShowButton = new Button();
+        //Button reloadButton = createToolbarButton("刷新");
+        // 设置按钮图标
+        loadImage("/image/复制.png", copyButton);
+        loadImage("/image/粘贴.png", pasteButton);
+        loadImage("/image/剪切.png", cutButton);
+        loadImage("/image/删除.png", deleteButton);
+        loadImage("/image/播放.png", slideShowButton);
 
         // 添加按钮事件
         copyButton.setOnAction(e -> {
@@ -95,9 +101,9 @@ public class ImageManager extends Application {
             }
         });
 
-        reloadButton.setOnAction(e -> refreshDisplay());
+        //reloadButton.setOnAction(e -> refreshDisplay());
 
-        operationBar.getChildren().addAll(copyButton, pasteButton, cutButton, deleteButton, reloadButton);
+        operationBar.getChildren().addAll(copyButton, pasteButton, cutButton, deleteButton,slideShowButton);
 
         // 将地址栏和操作栏添加到顶部工具栏
         topToolbar.getChildren().addAll(addressBarBox, operationBar);
@@ -123,15 +129,6 @@ public class ImageManager extends Application {
         ScrollPane imageScrollPane = new ScrollPane(imagePreviewPane);
         imageScrollPane.setFitToWidth(true);
 
-        // 初始化幻灯片播放按钮
-        Image play = new Image(getClass().getResourceAsStream("/image/24gf-playCircle-copy.png"));
-        ImageView playIcon = new ImageView(play);
-        playIcon.setFitWidth(15);
-        playIcon.setFitHeight(15);
-        Button slideShowButton = new Button();
-        slideShowButton.setGraphic(playIcon);
-        slideShowButton.setMinSize(30, 16);
-        slideShowButton.setMaxSize(30, 16);
 
         slideShowButton.setOnAction(e -> {
             TreeItem<File> selectedItem = directoryTree.getSelectionModel().getSelectedItem();
@@ -155,7 +152,7 @@ public class ImageManager extends Application {
         });
 
         // 布局组装
-        HBox bottomPanel = new HBox(10, slideShowButton, statusLabel);
+        HBox bottomPanel = new HBox(statusLabel);
         bottomPanel.setAlignment(Pos.CENTER_LEFT);
         bottomPanel.setPadding(new Insets(5));
         bottomPanel.setStyle("-fx-background-color: #f0f0f0;");
@@ -183,6 +180,9 @@ public class ImageManager extends Application {
         mainLayout.setCenter(splitPane);
         mainLayout.setLeft(leftPane);
         mainLayout.setBottom(bf);
+
+        Image icon = new Image(getClass().getResourceAsStream("/image/图标.png"));
+        primaryStage.getIcons().add(icon);
 
         Scene scene = new Scene(mainLayout, 1000, 700);
         primaryStage.setTitle("电子图片管理程序");
@@ -248,11 +248,17 @@ public class ImageManager extends Application {
         alert.showAndWait();
     }
 
-    /**
-     * 启动JavaFX应用
-     *
-     * @param args 命令行参数
-     */
+    //加载按钮图片
+    private void loadImage(String path,Button button) {
+        Image pic = new Image(getClass().getResourceAsStream(path));
+        ImageView picture = new ImageView(pic);
+        picture.setFitWidth(20);
+        picture.setFitHeight(20);
+        button.setGraphic(picture);
+        button.setMinSize(60, 25);
+        button.setMaxSize(60, 25);
+    }
+
     public static void main(String[] args) {
         launch(args);
     }

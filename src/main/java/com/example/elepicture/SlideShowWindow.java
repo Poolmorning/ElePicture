@@ -45,13 +45,22 @@ public class SlideShowWindow {
         StackPane imagePane = new StackPane(imageView);
         imagePane.setPadding(new Insets(10));
 
-        Button prevButton = new Button("左");
-        Button nextButton = new Button("右");
-        Button zoomInButton = new Button("放大");
-        Button zoomOutButton = new Button("缩小");
-        Button playButton = new Button("播放");
-        Button stopButton = new Button("停止");
-        Button exitButton = new Button("退出");
+        Button prevButton = new Button();
+        Button nextButton = new Button();
+        Button zoomInButton = new Button();
+        Button zoomOutButton = new Button();
+        Button playButton = new Button();
+        Button stopButton = new Button();
+        Button exitButton = new Button();
+        //加载图标
+        loadImage("/image/播放.png", playButton);
+        loadImage("/image/暂停.png", stopButton);
+        loadImage("/image/放大.png", zoomInButton);
+        loadImage("/image/缩小.png", zoomOutButton);
+        loadImage("/image/向左.png", prevButton);
+        loadImage("/image/向右.png", nextButton);
+        loadImage("/image/退出.png", exitButton);
+
 
         String buttonStyle = "-fx-font-size: 14px; -fx-min-width: 80px; -fx-min-height: 30px;";
         prevButton.setStyle(buttonStyle);
@@ -176,5 +185,16 @@ public class SlideShowWindow {
 
     public void show() {
         stage.show();
+    }
+
+    //加载按钮图片
+    private void loadImage(String path,Button button) {
+        Image pic = new Image(getClass().getResourceAsStream(path));
+        ImageView picture = new ImageView(pic);
+        picture.setFitWidth(15);
+        picture.setFitHeight(15);
+        button.setGraphic(picture);
+        button.setMinSize(30, 16);
+        button.setMaxSize(30, 16);
     }
 }
