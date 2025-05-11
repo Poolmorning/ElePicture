@@ -207,6 +207,7 @@ public class ThumbnailManager {
                     clearSelection();
                 }
                 selectBox(box);
+                statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已选中 " + selectedBoxes.size() + " 张图片");
                 showMenu(dir, box, event.getScreenX(), event.getScreenY(), statusLabel, fileOperator, imagePreviewPane);
             }
         });
