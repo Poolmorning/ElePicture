@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 //文件操作工具类，提供文件的增删改查功能
 public class FileOperator {
-
     private ClipboardManager clipboardManager;
     public FileOperator(ClipboardManager clipboardManager) {
         this.clipboardManager = clipboardManager;
