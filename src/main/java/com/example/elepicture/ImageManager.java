@@ -98,6 +98,7 @@ public class ImageManager extends Application {
 
         //reloadButton.setOnAction(e -> refreshDisplay());
 
+        // 将按钮添加到操作栏
         operationBar.getChildren().addAll(copyButton, pasteButton, cutButton, deleteButton,slideShowButton);
 
         // 将地址栏和操作栏添加到顶部工具栏
@@ -124,7 +125,7 @@ public class ImageManager extends Application {
         ScrollPane imageScrollPane = new ScrollPane(imagePreviewPane);
         imageScrollPane.setFitToWidth(true);
 
-
+        // 设置幻灯片播放按钮事件
         slideShowButton.setOnAction(e -> {
             TreeItem<File> selectedItem = directoryTree.getSelectionModel().getSelectedItem();
             if (selectedItem != null) {
@@ -136,7 +137,7 @@ public class ImageManager extends Application {
                 }
             }
         });
-
+        // 设置目录树选择监听器
         directoryTree.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 File dir = newVal.getValue();
@@ -164,27 +165,27 @@ public class ImageManager extends Application {
         leftPane.setPrefWidth(250);
 
         ScrollPane centerPane = imageScrollPane;
-
+        // 创建分割面板
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.HORIZONTAL);
         splitPane.getItems().addAll(leftPane, centerPane);
         splitPane.setDividerPositions(0.25);
         SplitPane.setResizableWithParent(leftPane, false);
-
+        // 设置主布局
         mainLayout.setTop(topToolbar);
         mainLayout.setCenter(splitPane);
         mainLayout.setLeft(leftPane);
         mainLayout.setBottom(bf);
-
+        // 设置窗口图标
         Image icon = new Image(getClass().getResourceAsStream("/image/图标.png"));
         primaryStage.getIcons().add(icon);
-
+        // 创建场景并显示
         Scene scene = new Scene(mainLayout, 1000, 700);
         primaryStage.setTitle("电子图片管理程序");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
+    //选择目录
     private void chooseDirectory(Stage stage) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("选择文件夹");
@@ -198,7 +199,7 @@ public class ImageManager extends Application {
             refreshDisplay();
         }
     }
-
+    //导航到指定目录
     private void navigateToDirectory(String path) {
         File newDir = new File(path);
         if (newDir.exists() && newDir.isDirectory()) {
@@ -208,13 +209,13 @@ public class ImageManager extends Application {
             showError("路径错误", "指定的路径不存在或不是有效的文件夹");
         }
     }
-
+    //刷新显示内容
     private void refreshDisplay() {
         if (currentDir != null) {
             thumbnailManager.generateThumbnails(currentDir, imagePreviewPane, statusLabel, fileOperator);
         }
     }
-
+    //显示错误信息
     private void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
