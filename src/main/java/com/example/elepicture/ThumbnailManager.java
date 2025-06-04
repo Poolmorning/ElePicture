@@ -149,7 +149,7 @@ public class ThumbnailManager {
             };
         }
     }
-
+    // 创建缩略图
     private void createThumbnail(File file, FlowPane imagePreviewPane, File dir, Label statusLabel, FileOperator fileOperator) {
 
         Image img = new Image(file.toURI().toString(), 100, 100, true, true, true);
@@ -207,6 +207,7 @@ public class ThumbnailManager {
                     clearSelection();
                 }
                 selectBox(box);
+                statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已选中 " + selectedBoxes.size() + " 张图片");
                 showMenu(dir, box, event.getScreenX(), event.getScreenY(), statusLabel, fileOperator, imagePreviewPane);
             }
         });
@@ -304,7 +305,7 @@ public class ThumbnailManager {
         }
         return selectedFiles;
     }
-
+    // 按下crtl选中框
     private void toggleSelectBox(VBox box) {
         if (selectedBoxes.contains(box)) {
             box.setStyle("-fx-border-color: transparent;");
@@ -314,24 +315,24 @@ public class ThumbnailManager {
             selectedBoxes.add(box);
         }
     }
-
+    // 选中框
     private void selectBox(VBox box) {
         box.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-background-color: lightblue;");
         selectedBoxes.add(box);
     }
-
+    // 取消选中框
     private void clearSelection() {
         for (VBox box : selectedBoxes) {
             box.setStyle("-fx-border-color: transparent;");
         }
         selectedBoxes.clear();
     }
-
+    // 判断是否是图片文件
     private boolean isImageFile(File file) {
         String name = file.getName().toLowerCase();
         return Arrays.stream(imageExtensions).anyMatch(name::endsWith);
     }
-
+    // 格式化文件大小
     private String formatSize(long size) {
         DecimalFormat df = new DecimalFormat("0.00");
         if (size >= 1024 * 1024) {
@@ -342,7 +343,7 @@ public class ThumbnailManager {
             return size + " B";
         }
     }
-
+    // 获取当前目录下的所有图片文件
     public List<File> getCurrentDirectoryImages(File dir) {
         List<File> imageFiles = new ArrayList<>();
         if (dir != null && dir.isDirectory()) {
@@ -361,7 +362,6 @@ public class ThumbnailManager {
     public Set<VBox> getSelectedBoxes() {
         return selectedBoxes;
     }
-
     // 获取图片框到文件的映射
     public HashMap<VBox, File> getBoxFileMap() {
         return boxFileMap;
