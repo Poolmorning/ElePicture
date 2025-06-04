@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="ElePicture:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/ElePicture_jar</output-path>
+  <artifact type="jar" name="ElePicture:jar4">
+    <output-path>$PROJECT_DIR$/out/artifacts/ElePicture_jar4</output-path>
     <root id="archive" name="ElePicture.jar">
       <element id="module-output" name="ElePicture" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/17.0.6/javafx-graphics-17.0.6.jar" path-in-jar="/" />

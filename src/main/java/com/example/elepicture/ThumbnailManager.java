@@ -73,20 +73,20 @@ public class ThumbnailManager {
         // 启动服务
         thumbnailLoaderService.restart();
     }
-
+    //加载服务内部类
     private class ThumbnailLoaderService extends Service<Void> {
         private File dir;
         private FlowPane imagePreviewPane;
         private Label statusLabel;
         private FileOperator fileOperator;
-
+        // 设置参数方法
         public void setParameters(File dir, FlowPane imagePreviewPane, Label statusLabel, FileOperator fileOperator) {
             this.dir = dir;
             this.imagePreviewPane = imagePreviewPane;
             this.statusLabel = statusLabel;
             this.fileOperator = fileOperator;
         }
-
+        // 创建任务
         @Override
         protected Task<Void> createTask() {
             return new Task<Void>() {
@@ -124,7 +124,7 @@ public class ThumbnailManager {
                                     }
                                 });
                             });
-
+                            // 遍历文件列表，创建缩略图
                             for (File file : files) {
                                 if (isCancelled()) {
                                     break;
@@ -149,42 +149,42 @@ public class ThumbnailManager {
             };
         }
     }
-    // 创建缩略图
+    // 创建单个缩略图
     private void createThumbnail(File file, FlowPane imagePreviewPane, File dir, Label statusLabel, FileOperator fileOperator) {
-
+        // 创建并配置图片视图
         Image img = new Image(file.toURI().toString(), 100, 100, true, true, true);
         ImageView imageView = new ImageView(img);
         imageView.setFitHeight(100);
         imageView.setFitWidth(100);
         imageView.setPreserveRatio(true);
-
+        // 创建图片容器
         Pane container = new Pane(imageView);
         container.setMinSize(100, 100);
         container.setMaxSize(100, 100);
         container.setPickOnBounds(false);
-
+        // 创建文件名标签
         Label nameLabel = new Label(file.getName());
         if (nameLabel.getText().length() > 10) {
             nameLabel.setText(nameLabel.getText().substring(0, 10) + "...");
         }
         nameLabel.setAlignment(Pos.CENTER);
-
+        // 创建缩略图VBox
         VBox box = new VBox(container, nameLabel);
         box.setSpacing(5);
         box.setPadding(new Insets(5));
         box.setStyle("-fx-border-color: transparent;");
-
+        // 添加到映射和集合
         boxFileMap.put(box, file);
         allThumbnails.add(box);
         box.setFocusTraversable(true);
-
+        // 设置鼠标点击事件
         box.setOnMouseClicked(event -> {
             box.requestFocus();
-            if (event.getButton() == MouseButton.PRIMARY) {
+            if (event.getButton() == MouseButton.PRIMARY) {// 左键点击事件
                 if (contextMenu != null) {
                     contextMenu.hide();
                 }
-                if (event.getClickCount() == 2) {
+                if (event.getClickCount() == 2) {// 双击事件，播放幻灯片
                     List<File> imageFiles = getCurrentDirectoryImages(dir);
                     if (!imageFiles.isEmpty()) {
                         int index = imageFiles.indexOf(boxFileMap.get(box));
@@ -195,36 +195,36 @@ public class ThumbnailManager {
                     }
                 }
 
-                if (event.isControlDown()) {
+                if (event.isControlDown()) {// 按下Ctrl键选中
                     toggleSelectBox(box);
                 } else {
                     clearSelection();
                     selectBox(box);
                 }
                 statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已选中 " + selectedBoxes.size() + " 张图片");
-            } else if (event.getButton() == MouseButton.SECONDARY) {
-                if (!selectedBoxes.contains(box)) {
-                    clearSelection();
+            } else if (event.getButton() == MouseButton.SECONDARY) {//右键菜单
+                if (!selectedBoxes.contains(box)) {// 如果当前框未被选中
+                    clearSelection();// 清除所有选中状态
                 }
-                selectBox(box);
+                selectBox(box);// 选中当前框
                 statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已选中 " + selectedBoxes.size() + " 张图片");
-                showMenu(dir, box, event.getScreenX(), event.getScreenY(), statusLabel, fileOperator, imagePreviewPane);
+                showMenu(dir, box, event.getScreenX(), event.getScreenY(), statusLabel, fileOperator, imagePreviewPane);// 显示右键菜单
             }
         });
-
+        //设置键盘事件，快捷键
         box.setOnKeyPressed(event -> {
-            if (event.isControlDown()) {
+            if (event.isControlDown()) {// 按下Ctrl键时
                 switch (event.getCode()) {
-                    case C:
+                    case C:// 复制
                         fileOperator.copy(selectedBoxes, boxFileMap);
                         statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已复制 " + selectedBoxes.size() + " 个文件");
                         event.consume();
                         break;
-                    case V:
+                    case V:// 粘贴
                         fileOperator.paste(dir);
                         generateThumbnails(dir, thisPane, statusLabel, fileOperator);
                         break;
-                    case D:
+                    case D:// 删除
                         try {
                             fileOperator.delete(selectedBoxes, boxFileMap);
                         } catch (IOException e) {
@@ -232,7 +232,7 @@ public class ThumbnailManager {
                         }
                         generateThumbnails(dir, thisPane, statusLabel, fileOperator);
                         break;
-                    case X:
+                    case X:// 剪切
                         fileOperator.cut(selectedBoxes, boxFileMap);
                         statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已剪切 " + selectedBoxes.size() + " 个文件");
                 }
@@ -243,35 +243,35 @@ public class ThumbnailManager {
         count++;
         totalSize += file.length();
     }
-
+    // 显示右键菜单
     private void showMenu(File currentDir, VBox box, double x, double y, Label statusLabel, FileOperator fileOperator, FlowPane imagePreviewPane) {
         if (contextMenu != null) {
             contextMenu.hide();
         }
 
         //File currentFile = boxFileMap.get(box);
-
+        // 创建菜单项
         MenuItem copyItem = new MenuItem("复制");
         MenuItem cutItem = new MenuItem("剪切");
         MenuItem pasteItem = new MenuItem("粘贴");
         MenuItem deleteItem = new MenuItem("删除");
         MenuItem renameItem = new MenuItem("重命名");
-
+        //复制
         copyItem.setOnAction(event -> {
             fileOperator.copy(getSelectedBoxes(), getBoxFileMap());
             statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已复制 " + selectedBoxes.size() + " 个文件");
         });
-
+        //剪切
         cutItem.setOnAction(event -> {
             fileOperator.cut(getSelectedBoxes(), getBoxFileMap());
             statusLabel.setText("共 " + count + " 张图片，总大小：" + formatSize(totalSize)+"——已剪切 " + selectedBoxes.size() + " 个文件");
         });
-
+        //粘贴
         pasteItem.setOnAction(event -> {
             fileOperator.paste(cur);
             generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
-
+        //删除
         deleteItem.setOnAction(event -> {
             try {
                 fileOperator.delete(getSelectedBoxes(), getBoxFileMap());
@@ -280,24 +280,24 @@ public class ThumbnailManager {
             }
             generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
-
+        //重命名
         renameItem.setOnAction(event -> {
             fileOperator.rename(getSelectedBoxes(), getBoxFileMap());
             generateThumbnails(cur, imagePreviewPane, statusLabel, fileOperator);
         });
-
+        // 初始化菜单
         if (contextMenu == null) {
             contextMenu = new ContextMenu();
             contextMenu.getItems().addAll(copyItem, cutItem, pasteItem, deleteItem, renameItem);
         }
-
+        // 显示菜单
         contextMenu.show(box, x, y);
         if (box == null) {
             contextMenu.show(imagePreviewPane, x, y);
         }
 
     }
-
+    // 获取当前选中的文件列表
     private List<File> getSelectedFiles() {
         List<File> selectedFiles = new ArrayList<>();
         for (VBox box : selectedBoxes) {
