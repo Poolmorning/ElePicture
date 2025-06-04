@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class FileOperator {
 
     private ClipboardManager clipboardManager;
-
     public FileOperator(ClipboardManager clipboardManager) {
         this.clipboardManager = clipboardManager;
     }
